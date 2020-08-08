@@ -1,6 +1,4 @@
-﻿using App.Engine.Physics;
-
-namespace physics.Engine.Structs
+﻿namespace Engine.Physics.Structs
 {
     /// <summary>
     /// Axis Aligned Bounding Box

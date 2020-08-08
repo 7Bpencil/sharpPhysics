@@ -1,4 +1,4 @@
-﻿namespace physics.Engine.Classes.ObjectTemplates
+﻿namespace Engine.Physics.Classes.Templates
 {
     public static class ObjectTemplates
     {

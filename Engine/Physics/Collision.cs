@@ -1,8 +1,8 @@
 ﻿using System;
-using physics.Engine.Classes;
-using physics.Engine.Structs;
+using Engine.Physics.Classes;
+using Engine.Physics.Structs;
 
-namespace physics.Engine
+namespace Engine.Physics
 {
     internal static class Collision
     {

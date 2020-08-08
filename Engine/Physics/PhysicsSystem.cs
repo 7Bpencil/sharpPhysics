@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using physics.Engine.Classes;
-using physics.Engine.Helpers;
-using physics.Engine.Structs;
+using Engine.Physics.Classes;
+using Engine.Physics.Helpers;
+using Engine.Physics.Structs;
 
-namespace physics.Engine
+namespace Engine.Physics
 {
     public class PhysicsSystem
     {
@@ -22,7 +22,7 @@ namespace physics.Engine
         
         public PhysicsSystem()
         {
-            Gravity = new Vector2(0, -9.8f * GravityScale);
+            Gravity = new Vector2(0, 9.8f * GravityScale);
             Friction = 1F;
         }
 
@@ -285,7 +285,7 @@ namespace physics.Engine
                 return;
             }
 
-            //AddGravity(obj, dt);
+            AddGravity(obj, dt);
             obj.Velocity -= new Vector2(Friction * dt);
 
             if (obj.Center.Y > 2000 || obj.Center.Y < -2000 || obj.Center.X > 2000 || obj.Center.X < -2000)

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Windows.Forms;
 
-namespace physics
+namespace Engine
 {
     static class Program
     {
@@ -10,7 +11,7 @@ namespace physics
         [STAThread]
         static void Main()
         {
-           Console.WriteLine("Hello World!");
+            Application.Run(new Example());
         }
     }
 }

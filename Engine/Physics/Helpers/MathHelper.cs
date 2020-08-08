@@ -7,7 +7,7 @@
  */
 
 
-namespace Engine.Helpers
+namespace Engine.Physics.Helpers
 {
     /// <summary>
     /// Contains common mathematical functions and constants.

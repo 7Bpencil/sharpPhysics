@@ -1,7 +1,6 @@
-﻿using physics.Engine;
-using physics.Engine.Structs;
+﻿using Engine.Physics.Structs;
 
-namespace App.Engine.Physics
+namespace Engine.Physics
 {
     public abstract class Shape
     {

@@ -23,7 +23,7 @@ SOFTWARE.
 using System;
 using System.Runtime.InteropServices;
 
-namespace physics.Engine
+namespace Engine.Physics
 {
     /// <summary>Represents a 2D vector using two single-precision floating-point numbers.</summary>
     /// <remarks>

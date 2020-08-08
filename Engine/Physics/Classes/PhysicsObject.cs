@@ -1,8 +1,7 @@
 ﻿using System;
-using App.Engine.Physics;
-using physics.Engine.Structs;
+using Engine.Physics.Structs;
 
-namespace physics.Engine.Classes
+namespace Engine.Physics.Classes
 {
     public class PhysicsObject
     {

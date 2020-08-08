@@ -1,4 +1,4 @@
-﻿namespace physics.Engine.Classes
+﻿namespace Engine.Physics.Classes
 {
     public class Manifold
     {

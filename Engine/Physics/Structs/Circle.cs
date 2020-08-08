@@ -1,7 +1,6 @@
-﻿using App.Engine.Physics;
-using Engine.Helpers;
+﻿using Engine.Physics.Helpers;
 
-namespace physics.Engine.Structs
+namespace Engine.Physics.Structs
 {
     public class Circle : Shape
     {

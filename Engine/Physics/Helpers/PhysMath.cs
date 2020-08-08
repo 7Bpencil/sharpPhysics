@@ -1,7 +1,7 @@
 ﻿using System;
-using physics.Engine.Structs;
+using Engine.Physics.Structs;
 
-namespace physics.Engine.Helpers
+namespace Engine.Physics.Helpers
 {
     public static class PhysMath
     {
