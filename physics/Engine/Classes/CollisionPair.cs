@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace physics.Engine.Classes
+﻿namespace physics.Engine.Classes
 {
     public class CollisionPair
     {
@@ -20,31 +13,12 @@ namespace physics.Engine.Classes
 
         public static bool operator ==(CollisionPair left, CollisionPair right)
         {
-            if (left.A.Aabb.Min == right.A.Aabb.Min && left.A.Aabb.Max == right.A.Aabb.Max &&
-                left.B.Aabb.Min == right.B.Aabb.Min && left.B.Aabb.Max == right.B.Aabb.Max ||
-
-                left.A.Aabb.Min == right.B.Aabb.Min && left.A.Aabb.Max == right.B.Aabb.Max &&
-                left.B.Aabb.Min == right.A.Aabb.Min && left.B.Aabb.Max == right.A.Aabb.Max)
-            {
-                return true;
-            }
-
-            return false;
+            return left.A == right.A && left.B == right.B || left.A == right.B && left.B == right.A;
         }
 
         public static bool operator !=(CollisionPair left, CollisionPair right)
         {
-            if (left.A.Aabb.Min == right.A.Aabb.Min && left.A.Aabb.Max == right.A.Aabb.Max &&
-                left.B.Aabb.Min == right.B.Aabb.Min && left.B.Aabb.Max == right.B.Aabb.Max ||
-
-                left.A.Aabb.Min == right.B.Aabb.Min && left.A.Aabb.Max == right.B.Aabb.Max &&
-                left.B.Aabb.Min == right.A.Aabb.Min && left.B.Aabb.Max == right.A.Aabb.Max)
-            {
-                return false;
-            }
-
-            return true;
+            return !(left == right);
         }
-
     }
 }

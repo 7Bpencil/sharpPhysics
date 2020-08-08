@@ -1,56 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using physics.Engine.Structs;
-
-namespace physics.Engine.Classes.ObjectTemplates
+﻿namespace physics.Engine.Classes.ObjectTemplates
 {
     public static class ObjectTemplates
     {
-        private static ShaderDefault shaderDefault = new ShaderDefault();
-
-        private static ShaderWall shaderWall = new ShaderWall();
-
-        private static ShaderBall shaderBall = new ShaderBall();
-
-        private static ShaderBallVelocity shaderBallVelocity = new ShaderBallVelocity();
-
-        private static ShaderWater shaderWater = new ShaderWater();
-
-        public static PhysicsObject CreateSmallBall(float originX, float originY)
+        public static PhysicsObject CreateSmallBall(Vector2 origin)
         {
-            return PhysicsSystem.CreateStaticCircle(new Vec2(originX, originY), 5, .7F, false, shaderBallVelocity);
+            return PhysicsSystem.CreateStaticCircle(origin, 10, .7F, false);
         }
-        public static PhysicsObject CreateSmallBall_Magnet(float originX, float originY)
+
+        public static PhysicsObject CreateSmallBall_Magnet(Vector2 origin)
         {
-            var oPhysicsObject = PhysicsSystem.CreateStaticCircle(new Vec2(originX, originY), 5, .95F, false, shaderBallVelocity);
+            var oPhysicsObject = PhysicsSystem.CreateStaticCircle(origin, 5, .95F, false);
             PhysicsSystem.ListGravityObjects.Add(oPhysicsObject);
             return oPhysicsObject;
         }
 
-        public static PhysicsObject CreateMedBall(float originX, float originY)
+        public static PhysicsObject CreateMedBall(Vector2 origin)
         {
-            return PhysicsSystem.CreateStaticCircle(new Vec2(originX, originY), 10, .95F, false, shaderBallVelocity);
+            return PhysicsSystem.CreateStaticCircle(origin, 30, .95F, false);
         }
 
-        public static PhysicsObject CreateWater(float originX, float originY)
+        public static PhysicsObject CreateWater(Vector2 origin)
         {
-            return PhysicsSystem.CreateStaticCircle(new Vec2(originX, originY), 5, .99F, false, shaderWater);
+            return PhysicsSystem.CreateStaticCircle(origin, 5, .99F, false);
         }
 
-        public static PhysicsObject CreateAttractor(float originX, float originY)
+        public static PhysicsObject CreateAttractor(Vector2 origin)
         {
-            var oPhysicsObject = PhysicsSystem.CreateStaticCircle(new Vec2(originX, originY), 50, .95F, true, shaderBall);
+            var oPhysicsObject = PhysicsSystem.CreateStaticCircle(origin, 50, .95F, true);
             PhysicsSystem.ListGravityObjects.Add(oPhysicsObject);
             return oPhysicsObject;
         }
 
-        public static PhysicsObject CreateWall(float minX, float minY, float maxX, float maxY)
+        public static PhysicsObject CreateWall(Vector2 min, Vector2 max)
         {
-            return PhysicsSystem.CreateStaticBox(new Vec2(minX, minY), new Vec2(maxX, maxY), true, shaderWall, 1000000);
+            return PhysicsSystem.CreateStaticBox(min, max, true, 1000000);
         }
     }
 }

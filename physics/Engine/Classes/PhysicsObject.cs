@@ -1,60 +1,33 @@
 ﻿using System;
-using System.Drawing;
-using System.Runtime.CompilerServices;
+using App.Engine.Physics;
 using physics.Engine.Structs;
 
 namespace physics.Engine.Classes
 {
     public class PhysicsObject
     {
-        public enum Type
-        {
-            Box,
-            Circle
-        }
-
-        public aShader Shader;
         public bool Locked;
-        public AABB Aabb;
-        public Vec2 Velocity;
-        public Vec2 Center;
-        public Vec2 Pos;
-        public float Width;
-        public float Height;
+        public Shape Shape;
+        public Vector2 Velocity;
+        public Vector2 Center;
         public float Restitution;
         public float Mass;
         public float IMass;
 
-        public PhysicsObject(AABB boundingBox, Type t, float r, bool locked, aShader shader, float m = 0)
+        public PhysicsObject(Shape shape, Vector2 center, float r, bool locked, float m = 0)
         {
-            Velocity = new Vec2(0, 0);
-            Aabb = boundingBox;
-            Width = Aabb.Max.X - Aabb.Min.X;
-            Height = Aabb.Max.Y - Aabb.Min.Y;
-            Pos = new Vec2(Aabb.Min.X, Aabb.Min.Y);
-            Center = new Vec2(Pos.X + Width / 2, Pos.Y + Height / 2);
-            ShapeType = t;
+            Shape = shape;
+            Velocity = Vector2.Zero;
+            Center = center;
             Restitution = r;
-            Mass = (int)m == 0 ? Aabb.Area : m;
+            Mass = (int) m == 0 ? shape.GetArea() : m;
             IMass = 1 / Mass;
             Locked = locked;
-            Shader = shader;
         }
 
-        public Type ShapeType { get; set; }
-        public Manifold LastCollision { get; internal set; }
-
-        public bool Contains(PointF p)
+        public bool Contains(Vector2 point)
         {
-            if (Aabb.Max.X > p.X && p.X > Aabb.Min.X)
-            {
-                if (Aabb.Max.Y > p.Y && p.Y > Aabb.Min.Y)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return Shape.ContainsPoint(point);
         }
 
         public void Move(float dt)
@@ -63,43 +36,35 @@ namespace physics.Engine.Classes
             {
                 return;
             }
-            RoundSpeedToZero();
 
-            var p1 = Aabb.Min + (Velocity * dt);
-            var p2 = Aabb.Max + (Velocity * dt);
-            Aabb = new AABB { Min = p1, Max = p2 };
-            Recalculate();
+            RoundSpeedToZero();
+            
+            Shape.MoveBy(Velocity * dt);
+            Center += Velocity * dt;
         }
 
         private void RoundSpeedToZero()
         {
-            if (Math.Abs(this.Velocity.X) + Math.Abs(this.Velocity.Y) < .01F)
+            if (Math.Abs(Velocity.X) + Math.Abs(Velocity.Y) < .01F)
             {
-                Velocity.X = 0;
-                Velocity.Y = 0;
+                Velocity = Vector2.Zero;
             }
         }
 
-        private void Recalculate()
-        {
-            Width = Aabb.Max.X - Aabb.Min.X;
-            Height = Aabb.Max.Y - Aabb.Min.Y;
-            Pos.X = Aabb.Min.X;
-            Pos.Y = Aabb.Min.Y;
-            Center.X = Pos.X + Width / 2;
-            Center.Y = Pos.Y + Height / 2;
-        }
-
-        public void Move(Vec2 dVector)
+        public void Move(Vector2 dVector)
         {
             if (Locked)
             {
                 return;
             }
+            
+            Shape.MoveBy(dVector);
+            Center += dVector;
+        }
 
-            Aabb.Min = Aabb.Min + dVector;
-            Aabb.Max = Aabb.Max + dVector;
-            Recalculate();
+        public AABB GetBoundingBox()
+        {
+            return Shape.GetBoundingBox();
         }
     }
 }

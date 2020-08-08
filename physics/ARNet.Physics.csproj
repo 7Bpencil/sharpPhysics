@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>physics</RootNamespace>
     <AssemblyName>ARNet.Physics</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -22,15 +22,17 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -47,29 +49,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Classes\CollisionPair.cs" />
-    <Compile Include="Engine\Classes\Controller.cs" />
+    <Compile Include="Engine\Classes\Manifold.cs" />
+    <Compile Include="Engine\Classes\PhysicsObject.cs" />
     <Compile Include="Engine\Classes\Templates\ActionTemplates.cs" />
     <Compile Include="Engine\Classes\Templates\ObjectTemplates.cs" />
-    <Compile Include="Engine\Helpers\AccurateTimer.cs" />
-    <Compile Include="Engine\Shader.cs" />
-    <Compile Include="Engine\Structs\Vec2.cs" />
     <Compile Include="Engine\Collision.cs" />
-    <Compile Include="Engine\PhysicsSystem.cs" />
+    <Compile Include="Engine\Helpers\MathHelper.cs" />
     <Compile Include="Engine\Helpers\PhysMath.cs" />
-    <Compile Include="Engine\Classes\PhysicsObject.cs" />
-    <Compile Include="Engine\Classes\Manifold.cs" />
-    <Compile Include="FormMainWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormMainWindow.Designer.cs">
-      <DependentUpon>FormMainWindow.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Engine\PhysicsSystem.cs" />
+    <Compile Include="Engine\Shape.cs" />
     <Compile Include="Engine\Structs\AABB.cs" />
+    <Compile Include="Engine\Structs\Circle.cs" />
+    <Compile Include="Engine\Vector2.cs" />
+    <Compile Include="LeoECS\EcsComponent.cs" />
+    <Compile Include="LeoECS\EcsEntity.cs" />
+    <Compile Include="LeoECS\EcsFilter.cs" />
+    <Compile Include="LeoECS\EcsHelpers.cs" />
+    <Compile Include="LeoECS\EcsSystem.cs" />
+    <Compile Include="LeoECS\EcsWorld.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="FormMainWindow.resx">
-      <DependentUpon>FormMainWindow.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -93,13 +92,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\poolTable.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\blackPoolBall_30px.png" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

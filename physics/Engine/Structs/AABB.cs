@@ -1,17 +1,44 @@
-﻿using System.Drawing;
-using physics.Engine.Classes;
+﻿using App.Engine.Physics;
 
 namespace physics.Engine.Structs
 {
     /// <summary>
-    /// Axis Aligned bounding box struct that represents the position of an object within a coordinate system.
+    /// Axis Aligned Bounding Box
     /// </summary>
-    public struct AABB
+    public class AABB : Shape
     {
-        public Vec2 Min;
-        public Vec2 Max;
-        public float Area => (Max.X - Min.X) * (Max.Y - Min.Y);
+        public Vector2 Min;
+        public Vector2 Max;
 
+        public AABB(Vector2 min, Vector2 max)
+        {
+            Min = min;
+            Max = max;
+        }
+
+        public Vector2 Size => new Vector2(Max.X - Min.X, Max.Y - Min.Y);
+
+        public override float GetArea()
+        {
+            return (Max.X - Min.X) * (Max.Y - Min.Y);
+        }
+
+        public override void MoveBy(Vector2 delta)
+        {
+            Min += delta;
+            Max += delta;
+        }
+
+        public override bool ContainsPoint(Vector2 point)
+        {
+            return point.X < Max.X && point.X > Min.X && point.Y < Max.Y && point.Y > Min.Y;
+        }
+
+        public override AABB GetBoundingBox()
+        {
+            return this;
+        }
+        
         public static bool operator ==(AABB left, AABB right)
         {
             return left.Min == right.Min && left.Max == right.Max;
@@ -19,8 +46,7 @@ namespace physics.Engine.Structs
 
         public static bool operator !=(AABB left, AABB right)
         {
-            return left.Min != right.Min || left.Max != right.Max;
+            return !(left == right);
         }
-
     }
 }

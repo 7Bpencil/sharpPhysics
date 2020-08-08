@@ -6,17 +6,12 @@ namespace physics.Engine
 {
     internal static class Collision
     {
-
         public static bool AABBvsAABB(AABB a, AABB b)
         {
-            // Exit with no intersection if found separated along an axis
-            if (a.Max.X < b.Min.X || a.Min.X > b.Max.X) return false;
-            if (a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y) return false;
-
-            // No separating axis found, therefor there is at least one overlapping axis
-            return true;
+            return !(a.Max.X < b.Min.X || a.Min.X > b.Max.X || a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y);
         }
-        public static bool AABBvsAABB(ref Manifold m)
+
+        public static bool AABBvsAABB(Manifold m)
         {
             // Setup a couple pointers to each object
             var A = m.A;
@@ -25,9 +20,8 @@ namespace physics.Engine
             // Vector from A to B
             var n = B.Center - A.Center;
 
-
-            var abox = A.Aabb;
-            var bbox = B.Aabb;
+            var abox = (AABB) A.Shape;
+            var bbox = (AABB) B.Shape;
 
             // Calculate half extents along x axis for each object
             var a_extent = (abox.Max.X - abox.Min.X) / 2;
@@ -53,30 +47,16 @@ namespace physics.Engine
                     if (x_overlap < y_overlap)
                     {
                         // Point towards B knowing that n points from A to B
-                        if (n.X < 0)
-                        {
-                            m.Normal = new Vec2 {X = -1, Y = 0};
-                        }
-                        else
-                        {
-                            m.Normal = new Vec2 {X = 1, Y = 0};
-                        }
-
+                        m.Normal = n.X < 0 ? new Vector2(-1, 0) : new Vector2(1, 0);
                         m.Penetration = x_overlap;
-                        return true;
-                    }
-
-                    // Point toward B knowing that n points from A to B
-                    if (n.Y < 0)
-                    {
-                        m.Normal = new Vec2 {X = 0, Y = -1};
                     }
                     else
                     {
-                        m.Normal = new Vec2 {X = 0, Y = 1};
+                        // Point toward B knowing that n points from A to B
+                        m.Normal = n.Y < 0 ? new Vector2(0, -1) : new Vector2(0, 1);
+                        m.Penetration = y_overlap;
                     }
-
-                    m.Penetration = y_overlap;
+                    
                     return true;
                 }
             }
@@ -84,20 +64,17 @@ namespace physics.Engine
             return false;
         }
 
-        public static bool CirclevsCircle(ref Manifold m)
+        public static bool CirclevsCircle(Manifold m)
         {
             // Setup a couple pointers to each object
-            var A = m.A;
-            var B = m.B;
+            var A = (Circle) m.A.Shape;
+            var B = (Circle) m.B.Shape;
 
             // Vector from A to B
-            var n = B.Center - A.Center;
+            var n = m.B.Center - m.A.Center;
 
-            var r = A.Width/2 + B.Width/2;
-            r *= r;
-
-
-            if (n.LengthSquared > r)
+            var r = A.Radius + B.Radius;
+            if (n.LengthSquared > r * r)
             {
                 return false;
             }
@@ -108,7 +85,7 @@ namespace physics.Engine
             if (d != 0)
             {
                 // Distance is difference between radius and distance
-                m.Penetration = m.A.Width/2 + m.B.Width/2 - d;
+                m.Penetration = r - d;
 
                 // Utilize our d since we performed sqrt on it already within Length( )
                 // Points from A to B, and is a unit vector
@@ -118,29 +95,29 @@ namespace physics.Engine
 
             // Circles are on same position
             // Choose random (but consistent) values
-            m.Penetration = A.Width/2;
-            m.Normal = new Vec2 {X = 1, Y = 0};
+            m.Penetration = A.Radius;
+            m.Normal = new Vector2(1, 0);
             return true;
         }
 
-        public static bool AABBvsCircle(ref Manifold m)
+        public static bool AABBvsCircle(Manifold m)
         {
             // Setup a couple pointers to each object
             //Box Shape
-            var box = m.A;
+            var box = (AABB) m.A.Shape;
 
             //CircleShape
-            var circle = m.B;
+            var circle = (Circle) m.B.Shape;
 
             // Vector from box to circle
-            var n = circle.Center - box.Center;
+            var n = m.B.Center - m.A.Center;
 
             // Closest point on box to center of circle
             var closest = n;
 
             // Calculate half extents along each axis
-            var x_extent = (box.Aabb.Max.X - box.Aabb.Min.X) / 2;
-            var y_extent = (box.Aabb.Max.Y - box.Aabb.Min.Y) / 2;
+            var x_extent = (box.Max.X - box.Min.X) / 2;
+            var y_extent = (box.Max.Y - box.Min.Y) / 2;
 
             // Clamp point to edges of the AABB
             closest.X = Clamp(-x_extent, x_extent, closest.X);
@@ -159,34 +136,20 @@ namespace physics.Engine
                 if (Math.Abs(n.X) < Math.Abs(n.Y))
                 {
                     // Clamp to closest extent
-                    if (closest.X > 0)
-                    {
-                        closest.X = x_extent;
-                    }
-                    else
-                    {
-                        closest.X = -x_extent;
-                    }
+                    closest.X = closest.X > 0 ? x_extent : -x_extent;
                 }
 
                 // y axis is shorter
                 else
                 {
                     // Clamp to closest extent
-                    if (closest.Y > 0)
-                    {
-                        closest.Y = y_extent;
-                    }
-                    else
-                    {
-                        closest.Y = -y_extent;
-                    }
+                    closest.Y = closest.Y > 0 ? y_extent : -y_extent;
                 }
             }
 
             var normal = n - closest;
             var d = normal.LengthSquared;
-            var r = circle.Width/2;
+            var r = circle.Radius;
 
             // Early out of the radius is shorter than distance to closest point and
             // Circle not inside the AABB
@@ -202,29 +165,29 @@ namespace physics.Engine
             // inside the AABB
             if (inside)
             {
-                m.Normal = Vec2.Normalize(-normal);
+                m.Normal = Vector2.Normalize(-normal);
                 m.Penetration = r - d;
             }
             else
             {
                 //If pushing up at all, go straight up (gravity hack)
-                m.Normal = Vec2.Normalize(normal);
+                m.Normal = Vector2.Normalize(normal);
                 m.Penetration = r - d;
             }
 
             return true;
         }
 
-        public static void ResolveCollision(ref Manifold m)
+        public static void ResolveCollision(Manifold m)
         {
             var rv = m.B.Velocity - m.A.Velocity;
 
-            if (float.IsNaN(m.Normal.X) || float.IsNaN(m.Normal.Y))
+            if (float.IsNaN(m.Normal.X + m.Normal.Y))
             {
                 return;
             }
 
-            var velAlongNormal = Vec2.DotProduct(rv, m.Normal);
+            var velAlongNormal = Vector2.Dot(rv, m.Normal);
 
             if (velAlongNormal > 0)
             {
@@ -233,8 +196,7 @@ namespace physics.Engine
 
             var e = Math.Min(m.A.Restitution, m.B.Restitution);
 
-            var j = -(1 + e) * velAlongNormal;
-            j = j / (m.A.IMass + m.B.IMass);
+            var j = -(1 + e) * velAlongNormal / (m.A.IMass + m.B.IMass);
 
             var impulse = m.Normal * j;
 
@@ -242,9 +204,9 @@ namespace physics.Engine
             m.B.Velocity = !m.B.Locked ? m.B.Velocity + impulse * m.B.IMass : m.B.Velocity;
         }
 
-        public static void PositionalCorrection(ref Manifold m)
+        public static void PositionalCorrection(Manifold m)
         {
-            var percent = 0.6F; // usually 20% to 80%
+            const float percent = 0.6F; // usually 20% to 80%
             var correction = m.Normal * (percent * (m.Penetration / (m.A.IMass + m.B.IMass)));
             if (!m.A.Locked)
             {
