@@ -14,7 +14,7 @@ namespace Engine.Physics.Systems
 
         public void Run()
         {
-            var friction = settings.Friction;
+            var friction = settings.Friction * settings.VelocityCoefficient;
             foreach (var idx in rigidBodies)
             {
                 ref var velocity = ref rigidBodies.Get2(idx);

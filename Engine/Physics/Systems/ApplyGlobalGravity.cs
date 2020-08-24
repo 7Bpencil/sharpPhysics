@@ -12,7 +12,7 @@ namespace Engine.Physics.Systems
 
         public void Run()
         {
-            var gravity = settings.Gravity;
+            var gravity = settings.Gravity * settings.VelocityCoefficient;
 
             foreach (var idx in rigidBodies)
             {

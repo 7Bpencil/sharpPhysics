@@ -36,7 +36,7 @@ namespace Engine
             AddObjects();
             
             keys = new KeyState();
-
+            
             var timer = new Timer();
             timer.Interval = 16;
             timer.Tick += GameLoop;
@@ -90,37 +90,25 @@ namespace Engine
             PhysicsObjectsFactory.CreateWall(Vector2.Zero, new Vector2(Width, 65), world, pToM);
             PhysicsObjectsFactory.CreateWall(new Vector2(0, Height - 65), new Vector2(Width, Height), world, pToM);
             
-            //PhysicsObjectsFactory.CreateWall(new Vector2(150, 400), new Vector2(300, 500), world, pToM);
-            //PhysicsObjectsFactory.CreateWall(new Vector2(500, 400), new Vector2(650, 500), world, pToM);
+            PhysicsObjectsFactory.CreateWall(new Vector2(150, 400), new Vector2(300, 500), world, pToM);
+            PhysicsObjectsFactory.CreateWall(new Vector2(500, 400), new Vector2(650, 500), world, pToM);
 
             for (var i = 0; i < 400; i += 20) {
                 for (var j = 0; j < 100; j += 20) {
                     PhysicsObjectsFactory.CreateSmallBall(new Vector2(i + 200, j + 150), world, pToM);
                 }
             }
-
-            // player = ObjectTemplates.CreateMedBall(new Vector2(300, 100));
-            // ObjectTemplates.CreateMedBall(new Vector2(500, 100));
-            //
+            
             PhysicsObjectsFactory.CreateAttractor(new Vector2(400, 450), world, pToM);
         }
 		
         private void GameLoop(object sender, EventArgs args)
         {
-            // var moveSpeed = 32 * 10;
-            // var velocity = Vector2.Zero;
-            // if (keys.W) velocity.Y -= moveSpeed;
-            // if (keys.A) velocity.X -= moveSpeed;
-            // if (keys.S) velocity.Y += moveSpeed;
-            // if (keys.D) velocity.X += moveSpeed;
-            //
-            // player.Velocity = velocity;
-            
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < settings.IterationsAmount; i++)
                 logicSystems.Run();
             Invalidate();
         }
-        
+
         protected override void OnPaint(PaintEventArgs e)
         {
             drawingState.gfxBuffer.Clear(Color.Black);

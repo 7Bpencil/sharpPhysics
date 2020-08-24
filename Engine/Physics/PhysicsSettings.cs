@@ -10,15 +10,19 @@
     
         public float GravityScale = 0.1f;
         public float Friction = 0.2f;
-        public float dt = 1 / (60f * 4f);
+        public int IterationsAmount = 10;
         public float MetersToPixels = 64f;
         public float PixelsToMeters;
+        public float VelocityCoefficient;
+        public float dt;
 
         public Vector2 Gravity;
         public float AccuracyTolerance;
 
         public PhysicsSettings()
         {
+            dt = 1 / (60f * IterationsAmount);
+            VelocityCoefficient = 2f / (IterationsAmount + 1);
             PixelsToMeters = 1 / MetersToPixels;
             AccuracyTolerance = 1 / (2 * MetersToPixels); // ~0.5px
             Gravity = new Vector2(0, 9.8f * GravityScale);

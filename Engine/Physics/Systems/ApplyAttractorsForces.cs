@@ -22,7 +22,7 @@ namespace Engine.Physics.Systems
                 ref var velocity = ref rigidBodies.Get3(idx);
                 var bodyCenter = rigidBodies.Get2(idx).Position;
 
-                velocity.Value += CalculateBodiesInfluence(bodyCenter);
+                velocity.Value += CalculateBodiesInfluence(bodyCenter) * settings.VelocityCoefficient;
             }
         }
 
