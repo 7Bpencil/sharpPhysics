@@ -1,31 +1,26 @@
 ﻿using System;
-using Engine.Physics.Classes;
-using Engine.Physics.Structs;
+using System.Runtime.CompilerServices;
+using Engine.Physics.Components;
+using Engine.Physics.Components.Colliders;
 
-namespace Engine.Physics
+
+namespace Engine.Physics.Helpers
 {
-    internal static class Collision
+    public static class CollisionDetection
     {
-        public static bool AABBvsAABB(AABB a, AABB b)
+        public static bool AABBvsAABB(ref AABB a, ref AABB b)
         {
             return !(a.Max.X < b.Min.X || a.Min.X > b.Max.X || a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y);
         }
-
-        public static bool AABBvsAABB(Manifold m)
+        
+        public static bool BoxBox(Box boxA, Vector2 centerA, Box boxB, Vector2 centerB, ref Manifold m)
         {
-            // Setup a couple pointers to each object
-            var A = m.A;
-            var B = m.B;
-
             // Vector from A to B
-            var n = B.Center - A.Center;
-
-            var abox = (AABB) A.Shape;
-            var bbox = (AABB) B.Shape;
-
+            var n = centerB - centerA;
+            
             // Calculate half extents along x axis for each object
-            var a_extent = (abox.Max.X - abox.Min.X) / 2;
-            var b_extent = (bbox.Max.X - bbox.Min.X) / 2;
+            var a_extent = boxA.HalfSize.X;
+            var b_extent = boxB.HalfSize.X;
 
             // Calculate overlap on x axis
             var x_overlap = a_extent + b_extent - Math.Abs(n.X);
@@ -34,8 +29,8 @@ namespace Engine.Physics
             if (x_overlap > 0)
             {
                 // Calculate half extents along y axis for each object
-                a_extent = (abox.Max.Y - abox.Min.Y) / 2;
-                b_extent = (bbox.Max.Y - bbox.Min.Y) / 2;
+                a_extent = boxA.HalfSize.Y;
+                b_extent = boxB.HalfSize.Y;
 
                 // Calculate overlap on y axis
                 var y_overlap = a_extent + b_extent - Math.Abs(n.Y);
@@ -63,15 +58,12 @@ namespace Engine.Physics
 
             return false;
         }
-
-        public static bool CirclevsCircle(Manifold m)
+        
+        
+        public static bool CircleCircle(Circle A, Vector2 centerA, Circle B, Vector2 centerB, ref Manifold m)
         {
-            // Setup a couple pointers to each object
-            var A = (Circle) m.A.Shape;
-            var B = (Circle) m.B.Shape;
-
             // Vector from A to B
-            var n = m.B.Center - m.A.Center;
+            var n = centerB - centerA;
 
             var r = A.Radius + B.Radius;
             if (n.LengthSquared > r * r)
@@ -99,34 +91,28 @@ namespace Engine.Physics
             m.Normal = new Vector2(1, 0);
             return true;
         }
-
-        public static bool AABBvsCircle(Manifold m)
+        
+        
+        public static bool BoxCircle(Box box, Vector2 centerA, Circle circle, Vector2 centerB, ref Manifold m)
         {
-            // Setup a couple pointers to each object
-            //Box Shape
-            var box = (AABB) m.A.Shape;
-
-            //CircleShape
-            var circle = (Circle) m.B.Shape;
-
             // Vector from box to circle
-            var n = m.B.Center - m.A.Center;
+            var n = centerB - centerA;
 
             // Closest point on box to center of circle
             var closest = n;
 
             // Calculate half extents along each axis
-            var x_extent = (box.Max.X - box.Min.X) / 2;
-            var y_extent = (box.Max.Y - box.Min.Y) / 2;
+            var x_extent = box.HalfSize.X;
+            var y_extent = box.HalfSize.Y;
 
-            // Clamp point to edges of the AABB
+            // Clamp point to edges of the Box
             closest.X = Clamp(-x_extent, x_extent, closest.X);
             closest.Y = Clamp(-y_extent, y_extent, closest.Y);
 
 
             var inside = false;
 
-            // Circle is inside the AABB, so we need to clamp the circle's center
+            // Circle's center is inside the Box, so we need to clamp the circle's center
             // to the closest edge
             if (n == closest)
             {
@@ -152,7 +138,7 @@ namespace Engine.Physics
             var r = circle.Radius;
 
             // Early out of the radius is shorter than distance to closest point and
-            // Circle not inside the AABB
+            // Circle not inside the Box
             if (d > r * r && !inside)
             {
                 return false;
@@ -162,7 +148,7 @@ namespace Engine.Physics
             d = (float) Math.Sqrt(d);
 
             // Collision normal needs to be flipped to point outside if circle was
-            // inside the AABB
+            // inside the Box
             if (inside)
             {
                 m.Normal = Vector2.Normalize(-normal);
@@ -177,48 +163,9 @@ namespace Engine.Physics
 
             return true;
         }
+        
 
-        public static void ResolveCollision(Manifold m)
-        {
-            var rv = m.B.Velocity - m.A.Velocity;
-
-            if (float.IsNaN(m.Normal.X + m.Normal.Y))
-            {
-                return;
-            }
-
-            var velAlongNormal = Vector2.Dot(rv, m.Normal);
-
-            if (velAlongNormal > 0)
-            {
-                return;
-            }
-
-            var e = Math.Min(m.A.Restitution, m.B.Restitution);
-
-            var j = -(1 + e) * velAlongNormal / (m.A.IMass + m.B.IMass);
-
-            var impulse = m.Normal * j;
-
-            m.A.Velocity = !m.A.Locked ? m.A.Velocity - impulse * m.A.IMass : m.A.Velocity;
-            m.B.Velocity = !m.B.Locked ? m.B.Velocity + impulse * m.B.IMass : m.B.Velocity;
-        }
-
-        public static void PositionalCorrection(Manifold m)
-        {
-            const float percent = 0.6F; // usually 20% to 80%
-            var correction = m.Normal * (percent * (m.Penetration / (m.A.IMass + m.B.IMass)));
-            if (!m.A.Locked)
-            {
-                m.A.Move(-correction * m.A.IMass);
-            }
-
-            if (!m.B.Locked)
-            {
-                m.B.Move(correction * m.B.IMass);
-            }
-        }
-
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
         private static float Clamp(float low, float high, float val)
         {
             return Math.Max(low, Math.Min(val, high));
