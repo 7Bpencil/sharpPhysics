@@ -1,20 +1,15 @@
 ﻿using System.Drawing;
+using Engine.Physics;
 using Engine.Physics.Components;
-using Engine.Physics.Helpers;
 using Leopotam.Ecs;
 
-namespace Engine.Physics.Systems
+namespace Engine.Render.Systems
 {
-    public class DrawAABBs : IEcsInitSystem, IEcsRunSystem
+    public class DrawAABBs : IEcsRunSystem
     {
         private EcsFilter<AABB> boundingBoxes = null;
         private PhysicsSettings settings = null;
         private DrawingState drawingState = null;
-        
-        public void Init()
-        {
-            //throw new System.NotImplementedException();
-        }
 
         public void Run()
         {

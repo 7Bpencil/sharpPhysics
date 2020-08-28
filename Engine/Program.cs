@@ -11,7 +11,7 @@ namespace Engine
         [STAThread]
         static void Main()
         {
-            Application.Run(new Example());
+            Application.Run(new Example.Example());
         }
     }
 }

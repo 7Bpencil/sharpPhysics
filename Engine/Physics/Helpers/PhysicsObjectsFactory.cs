@@ -5,18 +5,25 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Helpers
 {
-    public static class PhysicsObjectsFactory
+    public class PhysicsObjectsFactory
     {
+        private PhysicsSettings settings;
+
+        public PhysicsObjectsFactory(PhysicsSettings physicsSettings)
+        {
+            settings = physicsSettings;
+        }
+
         /// <summary>
         /// All units are in pixels 
         /// </summary>
         /// <param name="center"></param>
         /// <param name="world"></param>
-        public static EcsEntity CreateSmallBall(Vector2 center, EcsWorld world, float pixelsToMeters)
+        public EcsEntity CreateSmallBall(Vector2 center, EcsWorld world)
         {
             return CreateCircle(
-                center * pixelsToMeters, 
-                10 * pixelsToMeters, 
+                center * settings.PixelsToMeters, 
+                10 * settings.PixelsToMeters, 
                 1f, 0.7f, false, world);
         }
 
@@ -25,11 +32,11 @@ namespace Engine.Physics.Helpers
         /// </summary>
         /// <param name="center"></param>
         /// <param name="world"></param>
-        public static EcsEntity CreateMedBall(Vector2 center, EcsWorld world, float pixelsToMeters)
+        public EcsEntity CreateMedBall(Vector2 center, EcsWorld world)
         {
             return CreateCircle(
-                center * pixelsToMeters, 
-                30 * pixelsToMeters, 
+                center * settings.PixelsToMeters, 
+                30 * settings.PixelsToMeters, 
                 2f, 0.95f, false, world);
         }
         
@@ -37,13 +44,16 @@ namespace Engine.Physics.Helpers
         /// All units are in pixels
         /// </summary>
         /// <param name="center"></param>
+        /// <param name="locked"></param>
         /// <param name="world"></param>
-        public static EcsEntity CreateAttractor(Vector2 center, EcsWorld world, float pixelsToMeters)
+        /// <param name="pixelsToMeters"></param>
+        /// <returns></returns>
+        public EcsEntity CreateAttractor(Vector2 center, bool locked, EcsWorld world)
         {
             return CreateCircle(
-                    center * pixelsToMeters, 
-                    50 * pixelsToMeters, 
-                    1.5f, 0.95f, true, world)
+                    center * settings.PixelsToMeters, 
+                    40 * settings.PixelsToMeters, 
+                    1.5f, 0.95f, locked, world)
                 .Replace(new Attractor());
         }
 
@@ -54,12 +64,12 @@ namespace Engine.Physics.Helpers
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="world"></param>
-        public static EcsEntity CreateWall(Vector2 center, float width, float height, EcsWorld world, float pixelsToMeters)
+        public EcsEntity CreateWall(Vector2 center, float width, float height, EcsWorld world)
         {
             return CreateBox(
-                center * pixelsToMeters, 
-                width * pixelsToMeters, 
-                height * pixelsToMeters, 
+                center * settings.PixelsToMeters, 
+                width * settings.PixelsToMeters, 
+                height * settings.PixelsToMeters, 
                 1000f, 0.95f, true, world);
         }
         
@@ -69,13 +79,13 @@ namespace Engine.Physics.Helpers
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <param name="world"></param>
-        public static EcsEntity CreateWall(Vector2 min, Vector2 max, EcsWorld world, float pixelsToMeters)
+        public EcsEntity CreateWall(Vector2 min, Vector2 max, EcsWorld world)
         {
             return CreateWall(
                 (min + max) / 2, 
                 max.X - min.X, 
                 max.Y - min.Y,
-                world, pixelsToMeters);
+                world);
         }
 
         /// <summary>

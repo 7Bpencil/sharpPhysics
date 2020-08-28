@@ -5,12 +5,10 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class Broadphase : IEcsInitSystem, IEcsRunSystem
+    public class Broadphase : IEcsRunSystem
     {
         private EcsFilter<RigidBody, AABB> colliders = null;
         private PhysicsSystemState state = null;
-        
-        public void Init() { }
 
         public void Run()
         {

@@ -4,13 +4,11 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class ApplyAttractorsForces : IEcsInitSystem, IEcsRunSystem
+    public class ApplyAttractorsForces : IEcsRunSystem
     {
         private EcsFilter<Attractor, RigidBody, Transform> gravityBodies = null;
         private EcsFilter<RigidBody, Transform, Velocity>.Exclude<Attractor> rigidBodies = null;
         private PhysicsSettings settings = null;
-            
-        public void Init() { }
 
         public void Run()
         {

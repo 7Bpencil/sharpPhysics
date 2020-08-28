@@ -9,7 +9,7 @@
         /// Maybe it's not very useful in 2D but it's less mess
     
         public float GravityScale = 0.1f;
-        public float Friction = 0.2f;
+        public float Friction = 0.1f;
         public int IterationsAmount = 10;
         public float MetersToPixels = 64f;
         public float PixelsToMeters;

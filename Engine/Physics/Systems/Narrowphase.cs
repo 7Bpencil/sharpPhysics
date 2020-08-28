@@ -7,11 +7,9 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class Narrowphase : IEcsInitSystem, IEcsRunSystem
+    public class Narrowphase : IEcsRunSystem
     {
         private PhysicsSystemState state = null;
-
-        public void Init() { }
 
         public void Run()
         {

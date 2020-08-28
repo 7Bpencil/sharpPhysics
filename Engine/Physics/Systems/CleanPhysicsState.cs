@@ -3,11 +3,9 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class CleanPhysicsState : IEcsInitSystem, IEcsRunSystem
+    public class CleanPhysicsState : IEcsRunSystem
     {
         private PhysicsSystemState state = null;
-        
-        public void Init() { }
 
         public void Run()
         {

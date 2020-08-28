@@ -5,12 +5,10 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class SolveCollisions : IEcsInitSystem, IEcsRunSystem
+    public class SolveCollisions : IEcsRunSystem
     {
         private PhysicsSystemState state = null;
         private PhysicsSettings settings = null;
-        
-        public void Init() { }
 
         public void Run()
         {

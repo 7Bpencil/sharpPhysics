@@ -40,7 +40,9 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Example.cs" />
+        <Compile Include="Example\Components\Player.cs" />
+        <Compile Include="Example\Example.cs" />
+        <Compile Include="Example\Systems\InputSystem.cs" />
         <Compile Include="LeoECS\EcsComponent.cs" />
         <Compile Include="LeoECS\EcsEntity.cs" />
         <Compile Include="LeoECS\EcsFilter.cs" />
@@ -54,11 +56,10 @@
         <Compile Include="Physics\Components\CollisionPair.cs" />
         <Compile Include="Physics\Components\Manifold.cs" />
         <Compile Include="Physics\Components\PhysicsSystemState.cs" />
-        <Compile Include="Physics\Components\RigidBody\RigidBody.cs" />
+        <Compile Include="Physics\Components\RigidBody.cs" />
         <Compile Include="Physics\Components\Transform.cs" />
         <Compile Include="Physics\Components\Velocity.cs" />
         <Compile Include="Physics\Helpers\CollisionDetection.cs" />
-        <Compile Include="Physics\Helpers\DrawingState.cs" />
         <Compile Include="Physics\Helpers\MathHelper.cs" />
         <Compile Include="Physics\Helpers\PhysicsObjectsFactory.cs" />
         <Compile Include="Physics\Helpers\PhysMath.cs" />
@@ -66,8 +67,6 @@
         <Compile Include="Physics\Systems\Broadphase.cs" />
         <Compile Include="Physics\Systems\CleanPhysicsState.cs" />
         <Compile Include="Physics\Systems\CalcualteCollidersAABBs.cs" />
-        <Compile Include="Physics\Systems\DrawAABBs.cs" />
-        <Compile Include="Physics\Systems\DrawColliders.cs" />
         <Compile Include="Physics\Systems\SolveCollisions.cs" />
         <Compile Include="Physics\Systems\DeleteUnusedObjects.cs" />
         <Compile Include="Physics\Systems\ApplyGlobalGravity.cs" />
@@ -80,6 +79,10 @@
         <Compile Include="Physics\Vector2.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Render\DrawingState.cs" />
+        <Compile Include="Render\Systems\DrawAABBs.cs" />
+        <Compile Include="Render\Systems\DrawColliders.cs" />
+        <Compile Include="Render\Systems\DrawVelocities.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

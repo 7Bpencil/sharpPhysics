@@ -5,12 +5,10 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class ApplyFriction : IEcsInitSystem, IEcsRunSystem
+    public class ApplyFriction : IEcsRunSystem
     {
         private EcsFilter<RigidBody, Velocity> rigidBodies = null;
         private PhysicsSettings settings = null;
-        
-        public void Init() { }
 
         public void Run()
         {

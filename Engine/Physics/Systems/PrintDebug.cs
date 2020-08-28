@@ -5,11 +5,9 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class PrintDebug : IEcsInitSystem, IEcsRunSystem
+    public class PrintDebug : IEcsRunSystem
     {
         private EcsFilter<RigidBody, Transform, Velocity> rigidBodies = null;
-        
-        public void Init() { }
 
         public void Run()
         {

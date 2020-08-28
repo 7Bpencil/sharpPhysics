@@ -5,12 +5,10 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class CalcualteCollidersAABBs : IEcsInitSystem, IEcsRunSystem
+    public class CalcualteCollidersAABBs : IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Transform, Circle, AABB> circles = null;
+        private EcsFilter<RigidBody, Transform, Circle, AABB> circles = null; 
         private EcsFilter<RigidBody, Transform, Box, AABB> boxes = null;
-        
-        public void Init() { }
 
         public void Run()
         {
