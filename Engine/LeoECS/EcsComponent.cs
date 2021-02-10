@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------
 // The MIT License
 // Simple Entity Component System framework https://github.com/Leopotam/ecs
-// Copyright (c) 2017-2020 Leopotam <leopotam@gmail.com>
+// Copyright (c) 2017-2021 Leopotam <leopotam@gmail.com>
 // ----------------------------------------------------------------------------
 
 using System;
@@ -17,11 +17,12 @@ namespace Leopotam.Ecs {
     public interface IEcsIgnoreInFilter { }
 
     /// <summary>
-    /// Marks component to be checked for AutoReset behaviour. Checks works in DEBUG mode only.
+    /// Marks component type for custom reset behaviour.
     /// </summary>
-    [System.Diagnostics.Conditional ("DEBUG")]
-    [AttributeUsage (AttributeTargets.Struct)]
-    public sealed class EcsAutoResetCheckAttribute : Attribute { }
+    /// <typeparam name="T">Type of component, should be the same as main component!</typeparam>
+    public interface IEcsAutoReset<T> where T : struct {
+        void AutoReset (ref T c);
+    }
 
     /// <summary>
     /// Marks field of IEcsSystem class to be ignored during dependency injection.
@@ -37,17 +38,18 @@ namespace Leopotam.Ecs {
         public static readonly int TypeIndex;
         public static readonly Type Type;
         public static readonly bool IsIgnoreInFilter;
-#if DEBUG
-        internal static readonly bool NeedCheckAutoReset;
-#endif
+        public static readonly bool IsAutoReset;
         // ReSharper restore StaticMemberInGenericType
 
         static EcsComponentType () {
             TypeIndex = Interlocked.Increment (ref EcsComponentPool.ComponentTypesCount);
             Type = typeof (T);
             IsIgnoreInFilter = typeof (IEcsIgnoreInFilter).IsAssignableFrom (Type);
+            IsAutoReset = typeof (IEcsAutoReset<T>).IsAssignableFrom (Type);
 #if DEBUG
-            NeedCheckAutoReset = Attribute.IsDefined (typeof (T), typeof (EcsAutoResetCheckAttribute));
+            if (!IsAutoReset && Type.GetInterface ("IEcsAutoReset`1") != null) {
+                throw new Exception ($"IEcsAutoReset should have <{typeof (T).Name}> constraint for component \"{typeof (T).Name}\".");
+            }
 #endif
         }
     }
@@ -69,21 +71,12 @@ namespace Leopotam.Ecs {
     }
 
     /// <summary>
-    /// Helper for save reference to component. 
+    /// Helper for save reference to component.
     /// </summary>
     /// <typeparam name="T">Type of component.</typeparam>
     public struct EcsComponentRef<T> where T : struct {
         internal EcsComponentPool<T> Pool;
         internal int Idx;
-
-#if ENABLE_IL2CPP
-    [Unity.IL2CPP.CompilerServices.Il2CppSetOption (Unity.IL2CPP.CompilerServices.Option.NullChecks, false)]
-    [Unity.IL2CPP.CompilerServices.Il2CppSetOption (Unity.IL2CPP.CompilerServices.Option.ArrayBoundsChecks, false)]
-#endif
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        public ref T Unref () {
-            return ref Pool.Items[Idx];
-        }
 
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
         public static bool operator == (in EcsComponentRef<T> lhs, in EcsComponentRef<T> rhs) {
@@ -105,15 +98,26 @@ namespace Leopotam.Ecs {
             return Idx;
             // ReSharper restore NonReadonlyMemberInGetHashCode
         }
+    }
 
 #if ENABLE_IL2CPP
     [Unity.IL2CPP.CompilerServices.Il2CppSetOption (Unity.IL2CPP.CompilerServices.Option.NullChecks, false)]
     [Unity.IL2CPP.CompilerServices.Il2CppSetOption (Unity.IL2CPP.CompilerServices.Option.ArrayBoundsChecks, false)]
 #endif
+    public static class EcsComponentRefExtensions {
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        public bool IsNull () {
-            return Pool != null;
+        public static ref T Unref<T> (in this EcsComponentRef<T> wrapper) where T : struct {
+            return ref wrapper.Pool.Items[wrapper.Idx];
         }
+
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
+        public static bool IsNull<T> (in this EcsComponentRef<T> wrapper) where T : struct {
+            return wrapper.Pool == null;
+        }
+    }
+
+    public interface IEcsComponentPoolResizeListener {
+        void OnComponentPoolResize ();
     }
 
 #if ENABLE_IL2CPP
@@ -121,28 +125,74 @@ namespace Leopotam.Ecs {
     [Unity.IL2CPP.CompilerServices.Il2CppSetOption (Unity.IL2CPP.CompilerServices.Option.ArrayBoundsChecks, false)]
 #endif
     public sealed class EcsComponentPool<T> : IEcsComponentPool where T : struct {
-        /// <summary>
-        /// Description of custom AutoReset handler.
-        /// </summary>
-        public delegate void AutoResetHandler (ref T component);
+        delegate void AutoResetHandler (ref T component);
 
         public Type ItemType { get; }
         public T[] Items = new T[128];
         int[] _reservedItems = new int[128];
         int _itemsCount;
         int _reservedItemsCount;
-        AutoResetHandler _autoReset;
+        readonly AutoResetHandler _autoReset;
+#if ENABLE_IL2CPP && !UNITY_EDITOR
+        T _autoresetFakeInstance;
+#endif
+        IEcsComponentPoolResizeListener[] _resizeListeners;
+        int _resizeListenersCount;
 
         internal EcsComponentPool () {
             ItemType = typeof (T);
+            if (EcsComponentType<T>.IsAutoReset) {
+                var autoResetMethod = typeof (T).GetMethod (nameof (IEcsAutoReset<T>.AutoReset));
+#if DEBUG
+
+                if (autoResetMethod == null) {
+                    throw new Exception (
+                        $"IEcsAutoReset<{typeof (T).Name}> explicit implementation not supported, use implicit instead.");
+                }
+#endif
+                _autoReset = (AutoResetHandler) Delegate.CreateDelegate (
+                    typeof (AutoResetHandler),
+#if ENABLE_IL2CPP && !UNITY_EDITOR
+                    _autoresetFakeInstance,
+#else
+                    null,
+#endif
+                    autoResetMethod);
+            }
+            _resizeListeners = new IEcsComponentPoolResizeListener[128];
+            _reservedItemsCount = 0;
         }
 
-        /// <summary>
-        /// Sets custom AutoReset behaviour handler. If null - disable custom behaviour and use default.
-        /// </summary>
-        /// <param name="cb">Handler.</param>
-        public void SetAutoReset (AutoResetHandler cb) {
-            _autoReset = cb;
+        void RaiseOnResizeEvent () {
+            for (int i = 0, iMax = _resizeListenersCount; i < iMax; i++) {
+                _resizeListeners[i].OnComponentPoolResize ();
+            }
+        }
+
+        public void AddResizeListener (IEcsComponentPoolResizeListener listener) {
+#if DEBUG
+            if (listener == null) { throw new Exception ("Listener is null."); }
+#endif
+            if (_resizeListeners.Length == _resizeListenersCount) {
+                Array.Resize (ref _resizeListeners, _resizeListenersCount << 1);
+            }
+            _resizeListeners[_resizeListenersCount++] = listener;
+        }
+
+        public void RemoveResizeListener (IEcsComponentPoolResizeListener listener) {
+#if DEBUG
+            if (listener == null) { throw new Exception ("Listener is null."); }
+#endif
+            for (int i = 0, iMax = _resizeListenersCount; i < iMax; i++) {
+                if (_resizeListeners[i] == listener) {
+                    _resizeListenersCount--;
+                    if (i < _resizeListenersCount) {
+                        _resizeListeners[i] = _resizeListeners[_resizeListenersCount];
+                    }
+                    _resizeListeners[_resizeListenersCount] = null;
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -152,6 +202,7 @@ namespace Leopotam.Ecs {
         public void SetCapacity (int capacity) {
             if (capacity > Items.Length) {
                 Array.Resize (ref Items, capacity);
+                RaiseOnResizeEvent ();
             }
         }
 
@@ -164,12 +215,8 @@ namespace Leopotam.Ecs {
                 id = _itemsCount;
                 if (_itemsCount == Items.Length) {
                     Array.Resize (ref Items, _itemsCount << 1);
+                    RaiseOnResizeEvent ();
                 }
-#if DEBUG
-                if (EcsComponentType<T>.NeedCheckAutoReset && _autoReset == null) {
-                    throw new Exception ($"AutoReset handler for component \"{ItemType.Name}\" should be initialized first.");
-                }
-#endif
                 // reset brand new instance if custom AutoReset was registered.
                 _autoReset?.Invoke (ref Items[_itemsCount]);
                 _itemsCount++;
