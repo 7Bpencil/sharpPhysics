@@ -10,6 +10,9 @@ namespace Engine.Render
         public Brush CircleBrush;
         public Pen BBoxPen;
 
+        public float MetersToPixels;
+        public float PixelsToMeters;
+
         public DrawingState(int width, int height)
         {
             bmpBuffer = new Bitmap(width, height);
@@ -17,6 +20,9 @@ namespace Engine.Render
             RectangleBrush = new SolidBrush(Color.Coral);
             BBoxPen = new Pen(Color.White);
             CircleBrush = new SolidBrush(Color.Silver);
+
+            MetersToPixels = 60f;  // 1m = 60px
+            PixelsToMeters = 1 / MetersToPixels;
         }
     }
 }

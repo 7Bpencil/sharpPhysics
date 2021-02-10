@@ -6,32 +6,34 @@ namespace Engine.Physics.Systems
 {
     public class ApplyAttractorsForces : IEcsRunSystem
     {
-        private EcsFilter<Attractor, RigidBody, Transform> gravityBodies = null;
-        private EcsFilter<RigidBody, Transform, Velocity>.Exclude<Attractor> rigidBodies = null;
+        private EcsFilter<Attractor, RigidBody, Pose> attractors = null;
+        private EcsFilter<RigidBody, Pose, Velocity>.Exclude<Attractor> bodies = null;
+
         private PhysicsSettings settings = null;
 
         public void Run()
         {
-            foreach (var idx in rigidBodies)
+            var dt = settings.dt;
+
+            foreach (var idx in bodies)
             {
-                ref var body = ref rigidBodies.Get1(idx);
+                ref var body = ref bodies.Get1(idx);
                 if (body.Locked) continue;
 
-                ref var velocity = ref rigidBodies.Get3(idx);
-                var bodyCenter = rigidBodies.Get2(idx).Position;
+                ref var velocity = ref bodies.Get3(idx).Linear;
+                var bodyCenter = bodies.Get2(idx).Position;
 
-                velocity.Value += CalculateBodiesInfluence(bodyCenter) * settings.VelocityCoefficient;
+                velocity += CalculateAttractorsInfluence(bodyCenter) * dt;
             }
         }
 
-        private Vector2 CalculateBodiesInfluence(Vector2 bodyCenter)
+        private Vector2 CalculateAttractorsInfluence(Vector2 bodyCenter)
         {
             var forces = Vector2.Zero;
-            foreach (var idy in gravityBodies)
+            foreach (var idx in attractors)
             {
-                //apply inverse square law
-                var diff = gravityBodies.Get3(idy).Position - bodyCenter;
-                var falloffMultiplier = gravityBodies.Get2(idy).Mass / diff.LengthSquared;
+                var diff = attractors.Get3(idx).Position - bodyCenter;
+                var falloffMultiplier = attractors.Get2(idx).Mass / diff.LengthSquared;
                 forces += diff * falloffMultiplier;
             }
 

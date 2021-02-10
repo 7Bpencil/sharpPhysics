@@ -1,4 +1,4 @@
-﻿namespace Engine.Physics.Components.Colliders
+﻿namespace Engine.Physics.Components.Shapes
 {
     public struct Box
     {

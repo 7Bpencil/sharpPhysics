@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Engine.Physics.Components;
-using Engine.Physics.Components.Colliders;
+using Engine.Physics.Components.Shapes;
 using Engine.Physics.Components.RigidBody;
 using Engine.Physics.Helpers;
 using Leopotam.Ecs;
@@ -29,8 +29,8 @@ namespace Engine.Physics.Systems
             var typeA = A.Get<RigidBody>().Type;
             var typeB = B.Get<RigidBody>().Type;
 
-            var positionA = A.Get<Transform>().Position;
-            var positionB = B.Get<Transform>().Position;
+            var positionA = A.Get<Pose>().Position;
+            var positionB = B.Get<Pose>().Position;
 
             switch (GetCollisionType(typeA, typeB))
             {

@@ -806,25 +806,21 @@ namespace Engine.Physics
 
         private static readonly string ListSeparator = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 
-        /// <inheritdoc/>
         public override string ToString()
         {
             return $"({X.ToString()}, {Y.ToString()})";
         }
 
-        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return obj is Vector2 && Equals((Vector2)obj);
         }
 
-        /// <inheritdoc/>
         public bool Equals(Vector2 other)
         {
             return X == other.X && Y == other.Y;
         }
 
-        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return (X.GetHashCode() * 397) ^ Y.GetHashCode();

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Engine.Physics.Components;
 
-namespace Engine.Physics.Components
+namespace Engine.Physics
 {
     public class PhysicsSystemState
     {

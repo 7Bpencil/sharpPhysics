@@ -7,15 +7,15 @@ namespace Engine.Physics.Systems
 {
     public class PrintDebug : IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Transform, Velocity> rigidBodies = null;
+        private EcsFilter<RigidBody, Pose, Velocity> bodies = null;
 
         public void Run()
         {
-            foreach (var idx in rigidBodies)
+            foreach (var idx in bodies)
             {
                 Console.WriteLine($"body idx: {idx.ToString()}, " +
-                                  $"position: {rigidBodies.Get2(idx).Position.ToString()}, " +
-                                  $"velocity: {rigidBodies.Get3(idx).Value.ToString()}");
+                                  $"position: {bodies.Get2(idx).Position.ToString()}, " +
+                                  $"velocity: {bodies.Get3(idx).Linear.ToString()}");
             }
             Console.WriteLine();
         }

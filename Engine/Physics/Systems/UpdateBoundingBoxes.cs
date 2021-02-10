@@ -1,28 +1,28 @@
 ﻿using Engine.Physics.Components;
-using Engine.Physics.Components.Colliders;
+using Engine.Physics.Components.Shapes;
 using Engine.Physics.Components.RigidBody;
 using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class CalculateBoundingBoxes : IEcsRunSystem
+    public class UpdateBoundingBoxes : IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Transform, Circle, BoundingBox> circles = null;
-        private EcsFilter<RigidBody, Transform, Box, BoundingBox> boxes = null;
+        private EcsFilter<RigidBody, Pose, Circle, BoundingBox> circles = null;
+        private EcsFilter<RigidBody, Pose, Box, BoundingBox> boxes = null;
 
         public void Run()
         {
-            ComputeForCircles();
-            ComputeForBoxes();
+            UpdateCircles();
+            UpdateBoxes();
         }
 
-        private void ComputeForCircles()
+        private void UpdateCircles()
         {
             foreach (var idx in circles)
             {
-                ref var bbox = ref circles.Get4(idx);
-                var circleRadius = circles.Get3(idx).Radius;
                 var center = circles.Get2(idx).Position;
+                var circleRadius = circles.Get3(idx).Radius;
+                ref var bbox = ref circles.Get4(idx);
 
                 var radiusVector = new Vector2(circleRadius);
                 bbox.Min = center - radiusVector;
@@ -30,17 +30,18 @@ namespace Engine.Physics.Systems
             }
         }
 
-        private void ComputeForBoxes()
+        private void UpdateBoxes()
         {
             foreach (var idx in boxes)
             {
-                ref var bbox = ref boxes.Get4(idx);
-                var halfSize = boxes.Get3(idx).HalfSize;
                 var center = boxes.Get2(idx).Position;
+                var halfSize = boxes.Get3(idx).HalfSize;
+                ref var bbox = ref boxes.Get4(idx);
 
                 bbox.Min = center - halfSize;
                 bbox.Max = center + halfSize;
             }
         }
+
     }
 }

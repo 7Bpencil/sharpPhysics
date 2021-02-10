@@ -1,5 +1,4 @@
-﻿using Engine.Physics.Components;
-using Leopotam.Ecs;
+﻿using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {

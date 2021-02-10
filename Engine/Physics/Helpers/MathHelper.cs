@@ -19,15 +19,5 @@ namespace Engine.Physics.Helpers
             val = Math.Max(low, Math.Min(val, high));
         }
 
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        public static void RoundToZero(ref Vector2 vector, float cutoff)
-        {
-            if (vector.Length < cutoff)
-            {
-                vector.X = 0;
-                vector.Y = 0;
-            }
-        }
-
     }
 }

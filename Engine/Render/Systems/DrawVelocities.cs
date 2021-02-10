@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using Engine.Physics;
 using Engine.Physics.Components;
-using Engine.Physics.Components.Colliders;
+using Engine.Physics.Components.Shapes;
 using Engine.Physics.Components.RigidBody;
 using Engine.Physics.Helpers;
 using Leopotam.Ecs;
@@ -11,20 +11,20 @@ namespace Engine.Render.Systems
 {
     public class DrawVelocities : IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Transform, Circle, Velocity> circles = null;
-        private EcsFilter<RigidBody, Transform, Box> boxes = null;
-        private PhysicsSettings settings = null;
+        private EcsFilter<RigidBody, Pose, Circle, Velocity> circles = null;
+        private EcsFilter<RigidBody, Pose, Box> boxes = null;
+
         private DrawingState drawingState = null;
 
         public void Run()
         {
-            var mToP = settings.MetersToPixels;
+            var mToP = drawingState.MetersToPixels;
 
             foreach (var idx in circles)
                 DrawCircle(
                     circles.Get2(idx).Position * mToP,
                     circles.Get3(idx).Radius * mToP,
-                    circles.Get4(idx).Value * mToP / 4,
+                    circles.Get4(idx).Linear * mToP / 4,
                     drawingState.gfxBuffer);
 
             foreach (var idx in boxes)

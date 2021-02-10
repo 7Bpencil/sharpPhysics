@@ -8,7 +8,6 @@ namespace Engine.Physics.Systems
     public class SolveCollisions : IEcsRunSystem
     {
         private PhysicsSystemState state = null;
-        private PhysicsSettings settings = null;
 
         public void Run()
         {
@@ -18,10 +17,10 @@ namespace Engine.Physics.Systems
             }
         }
 
-        private void ResolveCollision(Manifold m)
+        private static void ResolveCollision(Manifold m)
         {
-            ref var velocityA = ref m.BodyA.Get<Velocity>().Value;
-            ref var velocityB = ref m.BodyB.Get<Velocity>().Value;
+            ref var velocityA = ref m.BodyA.Get<Velocity>().Linear;
+            ref var velocityB = ref m.BodyB.Get<Velocity>().Linear;
 
             var rigidBodyA = m.BodyA.Get<RigidBody>();
             var rigidBodyB = m.BodyB.Get<RigidBody>();
@@ -44,8 +43,8 @@ namespace Engine.Physics.Systems
 
             var impulse = m.Normal * j;
 
-            if (!rigidBodyA.Locked) velocityA -= impulse * rigidBodyA.IMass * settings.VelocityCoefficient;
-            if (!rigidBodyB.Locked) velocityB += impulse * rigidBodyB.IMass * settings.VelocityCoefficient;
+            if (!rigidBodyA.Locked) velocityA -= impulse * rigidBodyA.IMass;
+            if (!rigidBodyB.Locked) velocityB += impulse * rigidBodyB.IMass;
         }
     }
 }

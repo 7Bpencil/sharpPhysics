@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using Engine.Physics;
 using Engine.Physics.Components;
-using Engine.Physics.Components.Colliders;
+using Engine.Physics.Components.Shapes;
 using Engine.Physics.Components.RigidBody;
 using Leopotam.Ecs;
 
@@ -9,19 +9,28 @@ namespace Engine.Render.Systems
 {
     public class DrawColliders : IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Transform, Circle> circles = null;
-        private EcsFilter<RigidBody, Transform, Box> boxes = null;
-        private PhysicsSettings settings = null;
+        private EcsFilter<RigidBody, Pose, Circle> circles = null;
+        private EcsFilter<RigidBody, Pose, Box> boxes = null;
+
         private DrawingState drawingState = null;
 
         public void Run()
         {
-            var mToP = settings.MetersToPixels;
+            var mToP = drawingState.MetersToPixels;
 
             foreach (var idx in circles)
-                DrawCircle(circles.Get2(idx).Position * mToP, circles.Get3(idx).Radius * mToP, drawingState.CircleBrush, drawingState.gfxBuffer);
+                DrawCircle(
+                    circles.Get2(idx).Position * mToP,
+                    circles.Get3(idx).Radius * mToP,
+                    drawingState.CircleBrush,
+                    drawingState.gfxBuffer);
+
             foreach (var idx in boxes)
-                DrawBox(boxes.Get2(idx).Position * mToP, boxes.Get3(idx).HalfSize * mToP, drawingState.RectangleBrush, drawingState.gfxBuffer);
+                DrawBox(
+                    boxes.Get2(idx).Position * mToP,
+                    boxes.Get3(idx).HalfSize * mToP,
+                    drawingState.RectangleBrush,
+                    drawingState.gfxBuffer);
         }
 
         private static void DrawCircle(Vector2 center, float radius, Brush brush, Graphics gfxBuffer)

@@ -1,6 +1,6 @@
 ﻿using System;
 using Engine.Physics.Components;
-using Engine.Physics.Components.Colliders;
+using Engine.Physics.Components.Shapes;
 
 
 namespace Engine.Physics.Helpers

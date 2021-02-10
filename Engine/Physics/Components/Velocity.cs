@@ -2,6 +2,6 @@
 {
     public struct Velocity
     {
-        public Vector2 Value;
+        public Vector2 Linear;
     }
 }

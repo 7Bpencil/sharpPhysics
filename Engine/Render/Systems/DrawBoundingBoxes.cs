@@ -8,12 +8,12 @@ namespace Engine.Render.Systems
     public class DrawBoundingBoxes : IEcsRunSystem
     {
         private EcsFilter<BoundingBox> boundingBoxes = null;
-        private PhysicsSettings settings = null;
+
         private DrawingState drawingState = null;
 
         public void Run()
         {
-            var mToP = settings.MetersToPixels;
+            var mToP = drawingState.MetersToPixels;
 
             foreach (var idx in boundingBoxes)
             {
