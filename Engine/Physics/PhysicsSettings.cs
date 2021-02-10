@@ -6,8 +6,8 @@
         /// length is meters
         /// mass is kg
         /// 1m = 64px
-        /// Maybe it's not very useful in 2D but it's less mess
-    
+        /// Maybe it's not really important in 2D but it's less mess
+
         public float GravityScale = 0.1f;
         public float Friction = 0.1f;
         public int IterationsAmount = 10;

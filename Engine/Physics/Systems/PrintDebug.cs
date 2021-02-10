@@ -13,9 +13,9 @@ namespace Engine.Physics.Systems
         {
             foreach (var idx in rigidBodies)
             {
-                Console.WriteLine("body idx: " + idx + 
-                                  ", position: " + rigidBodies.Get2(idx).Position + 
-                                  ", velocity: " + rigidBodies.Get3(idx).Value);
+                Console.WriteLine($"body idx: {idx.ToString()}, " +
+                                  $"position: {rigidBodies.Get2(idx).Position.ToString()}, " +
+                                  $"velocity: {rigidBodies.Get3(idx).Value.ToString()}");
             }
             Console.WriteLine();
         }

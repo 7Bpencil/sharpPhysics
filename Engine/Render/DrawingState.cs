@@ -8,14 +8,14 @@ namespace Engine.Render
         public Graphics gfxBuffer;
         public Brush RectangleBrush;
         public Brush CircleBrush;
-        public Pen AABBpen;
+        public Pen BBoxPen;
 
         public DrawingState(int width, int height)
         {
             bmpBuffer = new Bitmap(width, height);
             gfxBuffer = Graphics.FromImage(bmpBuffer);
             RectangleBrush = new SolidBrush(Color.Coral);
-            AABBpen = new Pen(Color.White);
+            BBoxPen = new Pen(Color.White);
             CircleBrush = new SolidBrush(Color.Silver);
         }
     }

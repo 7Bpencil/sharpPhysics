@@ -7,13 +7,13 @@ using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
 {
-    public class Narrowphase : IEcsRunSystem
+    public class NarrowPhase : IEcsRunSystem
     {
         private PhysicsSystemState state = null;
 
         public void Run()
         {
-            foreach (var pair in state.CollisionPairs) 
+            foreach (var pair in state.CollisionPairs)
             {
                 if (CalculateManifold(pair.BodyA, pair.BodyB, out var manifold))
                 {
@@ -21,14 +21,14 @@ namespace Engine.Physics.Systems
                 }
             }
         }
-        
+
         private static bool CalculateManifold(EcsEntity A, EcsEntity B, out Manifold manifold)
         {
             manifold = new Manifold {BodyA = A, BodyB = B};
-            
+
             var typeA = A.Get<RigidBody>().Type;
             var typeB = B.Get<RigidBody>().Type;
-            
+
             var positionA = A.Get<Transform>().Position;
             var positionB = B.Get<Transform>().Position;
 
@@ -53,8 +53,8 @@ namespace Engine.Physics.Systems
                 default: return false;
             }
         }
-        
-        
+
+
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
         private static CollisionType GetCollisionType(ColliderType a, ColliderType b)
         {

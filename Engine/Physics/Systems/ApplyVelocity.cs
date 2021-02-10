@@ -16,8 +16,8 @@ namespace Engine.Physics.Systems
             {
                 ref var transform = ref rigidBodies.Get2(idx);
                 ref var velocity = ref rigidBodies.Get3(idx).Value;
-                
-                PhysMath.RoundToZero(ref velocity, settings.AccuracyTolerance);
+
+                MathHelper.RoundToZero(ref velocity, settings.AccuracyTolerance);
                 transform.Position += velocity * settings.dt;
             }
         }

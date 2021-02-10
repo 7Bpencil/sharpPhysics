@@ -49,7 +49,7 @@
         <Compile Include="LeoECS\EcsHelpers.cs" />
         <Compile Include="LeoECS\EcsSystem.cs" />
         <Compile Include="LeoECS\EcsWorld.cs" />
-        <Compile Include="Physics\Components\AABB.cs" />
+        <Compile Include="Physics\Components\BoundingBox.cs" />
         <Compile Include="Physics\Components\Attractor.cs" />
         <Compile Include="Physics\Components\Colliders\Box.cs" />
         <Compile Include="Physics\Components\Colliders\Circle.cs" />
@@ -62,15 +62,14 @@
         <Compile Include="Physics\Helpers\CollisionDetection.cs" />
         <Compile Include="Physics\Helpers\MathHelper.cs" />
         <Compile Include="Physics\Helpers\PhysicsObjectsFactory.cs" />
-        <Compile Include="Physics\Helpers\PhysMath.cs" />
         <Compile Include="Physics\PhysicsSettings.cs" />
-        <Compile Include="Physics\Systems\Broadphase.cs" />
+        <Compile Include="Physics\Systems\BroadPhase.cs" />
         <Compile Include="Physics\Systems\CleanPhysicsState.cs" />
-        <Compile Include="Physics\Systems\CalcualteCollidersAABBs.cs" />
+        <Compile Include="Physics\Systems\CalculateBoundingBoxes.cs" />
         <Compile Include="Physics\Systems\SolveCollisions.cs" />
         <Compile Include="Physics\Systems\DeleteUnusedObjects.cs" />
         <Compile Include="Physics\Systems\ApplyGlobalGravity.cs" />
-        <Compile Include="Physics\Systems\Narrowphase.cs" />
+        <Compile Include="Physics\Systems\NarrowPhase.cs" />
         <Compile Include="Physics\Systems\CorrectPositions.cs" />
         <Compile Include="Physics\Systems\PrintDebug.cs" />
         <Compile Include="Physics\Systems\ApplyFriction.cs" />
@@ -80,7 +79,7 @@
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Render\DrawingState.cs" />
-        <Compile Include="Render\Systems\DrawAABBs.cs" />
+        <Compile Include="Render\Systems\DrawBoundingBoxes.cs" />
         <Compile Include="Render\Systems\DrawColliders.cs" />
         <Compile Include="Render\Systems\DrawVelocities.cs" />
     </ItemGroup>

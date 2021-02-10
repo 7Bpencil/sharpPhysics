@@ -4,6 +4,7 @@ using Engine.Physics;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Colliders;
 using Engine.Physics.Components.RigidBody;
+using Engine.Physics.Helpers;
 using Leopotam.Ecs;
 
 namespace Engine.Render.Systems
@@ -18,55 +19,50 @@ namespace Engine.Render.Systems
         public void Run()
         {
             var mToP = settings.MetersToPixels;
-            
+
             foreach (var idx in circles)
                 DrawCircle(
-                    circles.Get2(idx).Position * mToP, 
-                    circles.Get3(idx).Radius * mToP, 
-                    circles.Get4(idx).Value * mToP / 4, 
+                    circles.Get2(idx).Position * mToP,
+                    circles.Get3(idx).Radius * mToP,
+                    circles.Get4(idx).Value * mToP / 4,
                     drawingState.gfxBuffer);
-            
+
             foreach (var idx in boxes)
                 DrawBox(
-                    boxes.Get2(idx).Position * mToP, 
-                    boxes.Get3(idx).HalfSize * mToP, 
+                    boxes.Get2(idx).Position * mToP,
+                    boxes.Get3(idx).HalfSize * mToP,
                     drawingState.RectangleBrush, drawingState.gfxBuffer);
         }
-        
-        private void DrawCircle(Vector2 center, float radius, Vector2 velocity, Graphics gfxBuffer)
+
+        private static void DrawCircle(Vector2 center, float radius, Vector2 velocity, Graphics gfxBuffer)
         {
-            int r, g, b;
             var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
-            HsvToRgb(particleSpeed, 1, 1, out r, out g, out b);
+            HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
 
             gfxBuffer.FillEllipse(
                 new SolidBrush(Color.FromArgb(255, r, g, b)),
-                center.X - radius, center.Y - radius,
-                radius * 2, radius * 2);
+                center.X - radius, center.Y - radius, radius * 2, radius * 2);
         }
-        
-        private void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer)
+
+        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer)
         {
             var topLeft = center - halfSize;
-            gfxBuffer.FillRectangle(
-                brush, 
-                topLeft.X, topLeft.Y,
-                2 * halfSize.X, 2 * halfSize.Y);
+            gfxBuffer.FillRectangle(brush, topLeft.X, topLeft.Y, halfSize.X * 2, halfSize.Y * 2);
         }
-        
-        public static void HsvToRgb(double H, double S, double V, out int r, out int g, out int b)
+
+        public static void HsvToRgb(float H, float S, float V, out int r, out int g, out int b)
         {
-            double R, G, B;
-            
+            float R, G, B;
+
             while (H < 0) H += 360;
             while (H >= 360) H -= 360;
 
-            if (V <= 0) R = G = B = 0; 
+            if (V <= 0) R = G = B = 0;
             else if (S <= 0) R = G = B = V;
             else
             {
-                var hf = H / 60.0;
-                var i = (int)Math.Floor(hf);
+                var hf = H / 60f;
+                var i = (int) Math.Floor(hf);
                 var f = hf - i;
                 var pv = V * (1 - S);
                 var qv = V * (1 - S * f);
@@ -87,20 +83,11 @@ namespace Engine.Render.Systems
                     default: R = G = B = V; break;
                 }
             }
-            
-            r = Clamp((int)(R * 255.0));
-            g = Clamp((int)(G * 255.0));
-            b = Clamp((int)(B * 255.0));
+
+            r = (int) (MathHelper.Clamp(R, 0f, 1f) * 255);
+            g = (int) (MathHelper.Clamp(G, 0f, 1f) * 255);
+            b = (int) (MathHelper.Clamp(B, 0f, 1f) * 255);
         }
 
-        /// <summary>
-        /// Clamp a value to 0-255
-        /// </summary>
-        private static int Clamp(int i)
-        {
-            if (i < 0) return 0;
-            if (i > 255) return 255;
-            return i;
-        }
     }
 }

@@ -16,7 +16,7 @@ namespace Engine.Physics.Systems
             {
                 ref var body = ref rigidBodies.Get1(idx);
                 if (body.Locked) continue;
-                
+
                 ref var velocity = ref rigidBodies.Get3(idx);
                 var bodyCenter = rigidBodies.Get2(idx).Position;
 

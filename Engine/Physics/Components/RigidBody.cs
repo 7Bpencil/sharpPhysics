@@ -13,7 +13,7 @@ namespace Engine.Physics.Components.RigidBody
         public RigidBody(ColliderType type, float mass, float restitution, bool locked) : this()
         {
             if (mass <= 0) throw new ArgumentException();
-            
+
             Type = type;
             Mass = mass;
             IMass = 1 / mass;
@@ -27,7 +27,7 @@ namespace Engine.Physics.Components.RigidBody
         Circle = 1,
         Box = 2
     }
-    
+
     public enum CollisionType
     {
         CircleCircle = ColliderType.Circle * 10 + ColliderType.Circle,

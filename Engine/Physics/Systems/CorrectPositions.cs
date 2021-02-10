@@ -13,9 +13,9 @@ namespace Engine.Physics.Systems
             foreach (var manifold in state.Manifolds)
             {
                 Correct(manifold);
-            }   
+            }
         }
-        
+
         private static void Correct(Manifold m)
         {
             var rigidBodyA = m.BodyA.Get<RigidBody>();
@@ -23,7 +23,7 @@ namespace Engine.Physics.Systems
 
             ref var positionA = ref m.BodyA.Get<Transform>().Position;
             ref var positionB = ref m.BodyB.Get<Transform>().Position;
-            
+
             const float percent = 0.6F; // usually 20% to 80%
             var correction = m.Normal * (percent * (m.Penetration / (rigidBodyA.IMass + rigidBodyB.IMass)));
 

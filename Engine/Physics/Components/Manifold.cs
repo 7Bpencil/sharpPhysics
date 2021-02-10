@@ -6,7 +6,7 @@ namespace Engine.Physics.Components
     {
         public EcsEntity BodyA;
         public EcsEntity BodyB;
-        
+
         public float Penetration;
         public Vector2 Normal;
     }

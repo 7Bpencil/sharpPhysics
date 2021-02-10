@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Colliders;
 
@@ -8,16 +7,11 @@ namespace Engine.Physics.Helpers
 {
     public static class CollisionDetection
     {
-        public static bool AABBvsAABB(ref AABB a, ref AABB b)
-        {
-            return !(a.Max.X < b.Min.X || a.Min.X > b.Max.X || a.Max.Y < b.Min.Y || a.Min.Y > b.Max.Y);
-        }
-        
         public static bool BoxBox(Box boxA, Vector2 centerA, Box boxB, Vector2 centerB, ref Manifold m)
         {
             // Vector from A to B
             var n = centerB - centerA;
-            
+
             // Calculate half extents along x axis for each object
             var a_extent = boxA.HalfSize.X;
             var b_extent = boxB.HalfSize.X;
@@ -42,24 +36,24 @@ namespace Engine.Physics.Helpers
                     if (x_overlap < y_overlap)
                     {
                         // Point towards B knowing that n points from A to B
-                        m.Normal = n.X < 0 ? new Vector2(-1, 0) : new Vector2(1, 0);
+                        m.Normal = n.X < 0 ? -Vector2.UnitX : Vector2.UnitX;
                         m.Penetration = x_overlap;
                     }
                     else
                     {
                         // Point toward B knowing that n points from A to B
-                        m.Normal = n.Y < 0 ? new Vector2(0, -1) : new Vector2(0, 1);
+                        m.Normal = n.Y < 0 ? -Vector2.UnitY : Vector2.UnitY;
                         m.Penetration = y_overlap;
                     }
-                    
+
                     return true;
                 }
             }
 
             return false;
         }
-        
-        
+
+
         public static bool CircleCircle(Circle A, Vector2 centerA, Circle B, Vector2 centerB, ref Manifold m)
         {
             // Vector from A to B
@@ -88,11 +82,11 @@ namespace Engine.Physics.Helpers
             // Circles are on same position
             // Choose random (but consistent) values
             m.Penetration = A.Radius;
-            m.Normal = new Vector2(1, 0);
+            m.Normal = Vector2.UnitX;
             return true;
         }
-        
-        
+
+
         public static bool BoxCircle(Box box, Vector2 centerA, Circle circle, Vector2 centerB, ref Manifold m)
         {
             // Vector from box to circle
@@ -105,9 +99,8 @@ namespace Engine.Physics.Helpers
             var x_extent = box.HalfSize.X;
             var y_extent = box.HalfSize.Y;
 
-            // Clamp point to edges of the Box
-            closest.X = Clamp(-x_extent, x_extent, closest.X);
-            closest.Y = Clamp(-y_extent, y_extent, closest.Y);
+            MathHelper.Clamp(ref closest.X, -x_extent, x_extent);
+            MathHelper.Clamp(ref closest.Y, -y_extent, y_extent);
 
 
             var inside = false;
@@ -163,12 +156,6 @@ namespace Engine.Physics.Helpers
 
             return true;
         }
-        
 
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        private static float Clamp(float low, float high, float val)
-        {
-            return Math.Max(low, Math.Min(val, high));
-        }
     }
 }

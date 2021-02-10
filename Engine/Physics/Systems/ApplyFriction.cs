@@ -21,7 +21,7 @@ namespace Engine.Physics.Systems
         }
 
         [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        private void AddFriction(ref Vector2 velocity, float friction)
+        private static void AddFriction(ref Vector2 velocity, float friction)
         {
             velocity -= Vector2.Normalize(velocity) * friction;
         }

@@ -18,7 +18,7 @@ namespace Engine.Example
     {
         public bool W, A, S, D;
     }
-    
+
     public class Example : Form
     {
         private EcsWorld world;
@@ -36,7 +36,7 @@ namespace Engine.Example
             drawingState = new DrawingState(Size.Width, Size.Height);
             settings = new PhysicsSettings();
             keys = new KeyState();
-            
+
             CreateSystems();
             AddObjects();
 
@@ -45,46 +45,46 @@ namespace Engine.Example
             timer.Tick += GameLoop;
             timer.Start();
         }
-        
+
         private void CreateSystems()
         {
             world = new EcsWorld ();
-            
+
             gameplaySystems = new EcsSystems(world);
             gameplaySystems
                 .Add(new InputSystem())
                 .Inject(keys)
                 .Init();
-            
+
             physicsSystems = new EcsSystems (world);
             physicsSystems
-                .Add(new CalcualteCollidersAABBs())
-                .Add(new Broadphase())
-                .Add(new Narrowphase())
+                .Add(new CalculateBoundingBoxes())
+                .Add(new BroadPhase())
+                .Add(new NarrowPhase())
                 .Add(new SolveCollisions())
                 .Add(new CorrectPositions())
-                
+
                 .Add(new ApplyGlobalGravity())
                 .Add(new ApplyAttractorsForces())
                 .Add(new ApplyFriction())
-                
+
                 .Add(new ApplyVelocity())
-                
+
                 .Add(new CleanPhysicsState())
                 .Add(new DeleteUnusedObjects())
-                
+
                 //.Add(new PrintDebug())
-                
+
                 .Inject(settings)
                 .Inject(new PhysicsSystemState())
                 .Init();
-            
+
             renderSystems = new EcsSystems(world);
             renderSystems
                 //.Add(new DrawColliders())
                 .Add(new DrawVelocities())
-                //.Add(new DrawAABBs())
-                
+                //.Add(new DrawBoundingBoxes())
+
                 .Inject(settings)
                 .Inject(drawingState)
                 .Init();
@@ -93,12 +93,12 @@ namespace Engine.Example
         private void AddObjects()
         {
             var factory = new PhysicsObjectsFactory(settings);
-            
+
             factory.CreateWall(Vector2.Zero, new Vector2(65, Height), world);
             factory.CreateWall(new Vector2(Width - 65, 0), new Vector2(Width, Height), world);
             factory.CreateWall(Vector2.Zero, new Vector2(Width, 65), world);
             factory.CreateWall(new Vector2(0, Height - 65), new Vector2(Width, Height), world);
-            
+
             factory.CreateWall(new Vector2(150, 400), new Vector2(300, 500), world);
 
             for (var i = 0; i < 400; i += 20) {
@@ -107,19 +107,19 @@ namespace Engine.Example
                 }
             }
 
-            factory.CreateAttractor(new Vector2(400, 450), true, world);
+            factory.CreateAttractor(new Vector2(500, 450), true, world);
 
             factory.CreateAttractor(new Vector2(600, 250), true, world)
                 .Replace(new Player());
         }
-		
+
         private void GameLoop(object sender, EventArgs args)
         {
             gameplaySystems.Run();
-            
+
             for (var i = 0; i < settings.IterationsAmount; i++)
                 physicsSystems.Run();
-            
+
             Invalidate();
         }
 
@@ -127,7 +127,7 @@ namespace Engine.Example
         {
             drawingState.gfxBuffer.Clear(Color.Black);
             renderSystems.Run();
-            
+
             e.Graphics.DrawImage(drawingState.bmpBuffer, Point.Empty);
         }
 
@@ -151,10 +151,10 @@ namespace Engine.Example
                     keys.D = true;
                     break;
             }
-        
+
             base.OnKeyDown(e);
         }
-        
+
         protected override void OnKeyUp(KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -172,7 +172,7 @@ namespace Engine.Example
                     keys.D = false;
                     break;
             }
-        
+
             base.OnKeyUp(e);
         }
     }

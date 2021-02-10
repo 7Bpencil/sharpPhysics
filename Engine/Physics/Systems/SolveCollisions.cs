@@ -17,24 +17,22 @@ namespace Engine.Physics.Systems
                 ResolveCollision(manifold);
             }
         }
-        
+
         private void ResolveCollision(Manifold m)
         {
             ref var velocityA = ref m.BodyA.Get<Velocity>().Value;
             ref var velocityB = ref m.BodyB.Get<Velocity>().Value;
-            
+
             var rigidBodyA = m.BodyA.Get<RigidBody>();
             var rigidBodyB = m.BodyB.Get<RigidBody>();
-            
 
-            var rv = velocityB - velocityA;
-            
+
             if (float.IsNaN(m.Normal.X + m.Normal.Y))
             {
                 return;
             }
 
-            var velAlongNormal = Vector2.Dot(rv, m.Normal);
+            var velAlongNormal = Vector2.Dot(velocityB - velocityA, m.Normal);
 
             if (velAlongNormal > 0)
             {
