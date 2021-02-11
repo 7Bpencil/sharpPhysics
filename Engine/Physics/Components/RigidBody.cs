@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Engine.Physics.Components.RigidBody
+namespace Engine.Physics.Components
 {
     public struct RigidBody
     {

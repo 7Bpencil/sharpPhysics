@@ -2,7 +2,6 @@ using System;
 using System.Drawing;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Engine.Physics.Components.RigidBody;
 using Engine.Physics.Helpers;
 using Leopotam.Ecs;
 

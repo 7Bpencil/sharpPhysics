@@ -1,6 +1,5 @@
 ﻿using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Engine.Physics.Components.RigidBody;
 using Leopotam.Ecs;
 
 namespace Engine.Physics.Systems
