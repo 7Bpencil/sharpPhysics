@@ -1,7 +1,9 @@
-﻿using Engine.Physics.Components;
+﻿using Engine.Example.Components;
+using Engine.Physics;
+using Engine.Physics.Components;
 using Leopotam.Ecs;
 
-namespace Engine.Physics.Systems
+namespace Engine.Example.Systems
 {
     public class ApplyGravity : IEcsRunSystem
     {

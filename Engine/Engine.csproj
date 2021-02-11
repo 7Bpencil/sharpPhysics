@@ -40,8 +40,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Example\Components\Attractor.cs" />
         <Compile Include="Example\Components\Player.cs" />
         <Compile Include="Example\Example.cs" />
+        <Compile Include="Example\ObjectsFactory.cs" />
+        <Compile Include="Example\Systems\ApplyAttractorsForces.cs" />
+        <Compile Include="Example\Systems\ApplyGravity.cs" />
         <Compile Include="Example\Systems\InputSystem.cs" />
         <Compile Include="LeoECS\EcsComponent.cs" />
         <Compile Include="LeoECS\EcsEntity.cs" />
@@ -50,7 +54,6 @@
         <Compile Include="LeoECS\EcsSystem.cs" />
         <Compile Include="LeoECS\EcsWorld.cs" />
         <Compile Include="Physics\Components\BoundingBox.cs" />
-        <Compile Include="Physics\Components\Attractor.cs" />
         <Compile Include="Physics\Components\Shapes\Box.cs" />
         <Compile Include="Physics\Components\Shapes\Circle.cs" />
         <Compile Include="Physics\Components\CollisionPair.cs" />
@@ -68,11 +71,9 @@
         <Compile Include="Physics\Systems\UpdateBoundingBoxes.cs" />
         <Compile Include="Physics\Systems\SolveCollisions.cs" />
         <Compile Include="Physics\Systems\RemoveLeakedObjects.cs" />
-        <Compile Include="Physics\Systems\ApplyGravity.cs" />
         <Compile Include="Physics\Systems\NarrowPhase.cs" />
         <Compile Include="Physics\Systems\CorrectPositions.cs" />
         <Compile Include="Physics\Systems\PrintDebug.cs" />
-        <Compile Include="Physics\Systems\ApplyAttractorsForces.cs" />
         <Compile Include="Physics\Systems\IntegratePoses.cs" />
         <Compile Include="Physics\Vector2.cs" />
         <Compile Include="Program.cs" />

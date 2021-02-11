@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using Engine.Example.Components;
 using Engine.Example.Systems;
 using Engine.Physics;
-using Engine.Physics.Helpers;
 using Engine.Physics.Systems;
 using Engine.Render;
 using Engine.Render.Systems;
@@ -51,7 +50,10 @@ namespace Engine.Example
 
             gameplaySystems = new EcsSystems(world);
             gameplaySystems
+                // user defined logic - physics engine know nothing about gravity, players, or attractors
                 .Add(new InputSystem())
+                .Add(new ApplyGravity())
+                .Add(new ApplyAttractorsForces())
 
                 .Inject(keys)
                 .Inject(physicsSettings)
@@ -61,17 +63,12 @@ namespace Engine.Example
 
             physicsSystems = new EcsSystems (world);
             physicsSystems
-                .Add(new ApplyGravity())
-                .Add(new ApplyAttractorsForces())
-
                 .Add(new UpdateBoundingBoxes())
                 .Add(new BroadPhase())
                 .Add(new NarrowPhase())
                 .Add(new SolveCollisions())
                 .Add(new CorrectPositions())
-
                 .Add(new IntegratePoses())
-
                 .Add(new CleanPhysicsState())
                 .Add(new RemoveLeakedObjects())
 
@@ -96,23 +93,22 @@ namespace Engine.Example
 
         private void AddObjects()
         {
-            PhysicsObjectsFactory.CreateWall(new Vector2(0, 1), new Vector2(1, 11), world);
-            PhysicsObjectsFactory.CreateWall(new Vector2(1, 0), new Vector2(14, 1), world);
-            PhysicsObjectsFactory.CreateWall(new Vector2(14, 1), new Vector2(15, 11), world);
-            PhysicsObjectsFactory.CreateWall(new Vector2(1, 11), new Vector2(14, 12), world);
+            ObjectsFactory.CreateWall(new Vector2(0, 1), new Vector2(1, 11), world);
+            ObjectsFactory.CreateWall(new Vector2(1, 0), new Vector2(14, 1), world);
+            ObjectsFactory.CreateWall(new Vector2(14, 1), new Vector2(15, 11), world);
+            ObjectsFactory.CreateWall(new Vector2(1, 11), new Vector2(14, 12), world);
 
-            PhysicsObjectsFactory.CreateWall(new Vector2(3, 2.5f), new Vector2(6, 3.5f), world);
-
+            ObjectsFactory.CreateWall(new Vector2(3, 2.5f), new Vector2(6, 3.5f), world);
 
             var offset = new Vector2(2, 7);
             for (var i = 0; i < 20; ++i) {
                 for (var j = 0; j < 5; ++j) {
-                    PhysicsObjectsFactory.CreateSmallBall(offset + new Vector2(i, j) * 0.3f, world);
+                    ObjectsFactory.CreateSmallBall(offset + new Vector2(i, j) * 0.3f, world);
                 }
             }
 
-            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 3.5f), true, world);
-            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 6), false, world)
+            ObjectsFactory.CreateAttractor(new Vector2(9, 3.5f), true, world);
+            ObjectsFactory.CreateAttractor(new Vector2(9, 6), false, world)
                 .Replace(new Player());
         }
 

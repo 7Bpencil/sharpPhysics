@@ -18,6 +18,7 @@ namespace Engine.Render
             gfxBuffer.FillRectangle(brush, center.X - halfSize.X, canvasHeight - center.Y - halfSize.Y, halfSize.X * 2, halfSize.Y * 2);
         }
 
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
         public static void DrawBoundingBox(Vector2 min, Vector2 max, Pen pen, Graphics gfxBuffer, float canvasHeight)
         {
             var (sizeX, sizeY) = max - min;
