@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using Engine.Physics;
-using Engine.Physics.Components;
+﻿using Engine.Physics.Components;
 using Leopotam.Ecs;
 
 namespace Engine.Render.Systems
@@ -15,21 +13,18 @@ namespace Engine.Render.Systems
         {
             var mToP = drawingState.MetersToPixels;
             var canvasHeight = drawingState.CanvasHeight;
+            var gfxBuffer = drawingState.gfxBuffer;
+            var bboxPen = drawingState.BBoxPen;
 
             foreach (var idx in boundingBoxes)
             {
                 var bbox = boundingBoxes.Get1(idx);
-                DrawBoundingBox(
+                Renderer.DrawBoundingBox(
                     bbox.Min * mToP,
                     bbox.Max * mToP,
-                    drawingState.BBoxPen, drawingState.gfxBuffer, canvasHeight);
+                    bboxPen, gfxBuffer, canvasHeight);
             }
         }
 
-        private static void DrawBoundingBox(Vector2 min, Vector2 max, Pen pen, Graphics gfxBuffer, float canvasHeight)
-        {
-            var (sizeX, sizeY) = max - min;
-            gfxBuffer.DrawRectangle(pen, min.X, canvasHeight - min.Y - sizeY, sizeX, sizeY);
-        }
     }
 }

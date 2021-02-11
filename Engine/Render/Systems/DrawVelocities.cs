@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using Engine.Physics;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 using Engine.Physics.Components.RigidBody;
@@ -20,34 +19,28 @@ namespace Engine.Render.Systems
         {
             var mToP = drawingState.MetersToPixels;
             var canvasHeight = drawingState.CanvasHeight;
+            var gfxBuffer = drawingState.gfxBuffer;
+            var colliderBrush = drawingState.ColliderBrush;
+            var velocityBrush = drawingState.VelocityBrush;
 
             foreach (var idx in circles)
-                DrawCircle(
+            {
+                var velocity = circles.Get4(idx).Linear * mToP / 4;
+                var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
+                HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
+                velocityBrush.Color = Color.FromArgb(255, r, g, b);
+
+                Renderer.DrawCircle(
                     circles.Get2(idx).Position * mToP,
                     circles.Get3(idx).Radius * mToP,
-                    circles.Get4(idx).Linear * mToP / 4,
-                    drawingState.gfxBuffer, canvasHeight);
+                    velocityBrush, gfxBuffer, canvasHeight);
+            }
 
             foreach (var idx in boxes)
-                DrawBox(
+                Renderer.DrawBox(
                     boxes.Get2(idx).Position * mToP,
                     boxes.Get3(idx).HalfSize * mToP,
-                    drawingState.ColliderBrush, drawingState.gfxBuffer, canvasHeight);
-        }
-
-        private static void DrawCircle(Vector2 center, float radius, Vector2 velocity, Graphics gfxBuffer, float canvasHeight)
-        {
-            var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
-            HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
-
-            gfxBuffer.FillEllipse(
-                new SolidBrush(Color.FromArgb(255, r, g, b)),
-                center.X - radius, canvasHeight - center.Y - radius, radius * 2, radius * 2);
-        }
-
-        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer, float canvasHeight)
-        {
-            gfxBuffer.FillRectangle(brush, center.X - halfSize.X, canvasHeight - center.Y - halfSize.Y, halfSize.X * 2, halfSize.Y * 2);
+                    colliderBrush, gfxBuffer, canvasHeight);
         }
 
         public static void HsvToRgb(float H, float S, float V, out int r, out int g, out int b)
