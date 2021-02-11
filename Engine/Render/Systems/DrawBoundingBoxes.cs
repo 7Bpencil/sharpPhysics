@@ -14,18 +14,22 @@ namespace Engine.Render.Systems
         public void Run()
         {
             var mToP = drawingState.MetersToPixels;
+            var canvasHeight = drawingState.CanvasHeight;
 
             foreach (var idx in boundingBoxes)
             {
                 var bbox = boundingBoxes.Get1(idx);
-                DrawBoundingBox(bbox.Min * mToP, bbox.Max * mToP, drawingState.BBoxPen, drawingState.gfxBuffer);
+                DrawBoundingBox(
+                    bbox.Min * mToP,
+                    bbox.Max * mToP,
+                    drawingState.BBoxPen, drawingState.gfxBuffer, canvasHeight);
             }
         }
 
-        private static void DrawBoundingBox(Vector2 min, Vector2 max, Pen pen, Graphics gfxBuffer)
+        private static void DrawBoundingBox(Vector2 min, Vector2 max, Pen pen, Graphics gfxBuffer, float canvasHeight)
         {
-            var size = max - min;
-            gfxBuffer.DrawRectangle(pen, min.X, min.Y, size.X, size.Y);
+            var (sizeX, sizeY) = max - min;
+            gfxBuffer.DrawRectangle(pen, min.X, canvasHeight - min.Y - sizeY, sizeX, sizeY);
         }
     }
 }

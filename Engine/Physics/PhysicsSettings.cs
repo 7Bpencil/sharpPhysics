@@ -14,7 +14,7 @@
         public PhysicsSettings()
         {
             dt = 1 / 60f;
-            Gravity = new Vector2(0, 9.80665f);  // gravity points up because Y axis points down in GDI+
+            Gravity = new Vector2(0, -9.80665f);
         }
     }
 }

@@ -101,18 +101,18 @@ namespace Engine.Example
             PhysicsObjectsFactory.CreateWall(new Vector2(14, 1), new Vector2(15, 11), world);
             PhysicsObjectsFactory.CreateWall(new Vector2(1, 11), new Vector2(14, 12), world);
 
-            PhysicsObjectsFactory.CreateWall(new Vector2(3, 8.5f), new Vector2(6, 9.5f), world);
+            PhysicsObjectsFactory.CreateWall(new Vector2(3, 2.5f), new Vector2(6, 3.5f), world);
 
 
-            var offset = new Vector2(2);
+            var offset = new Vector2(2, 7);
             for (var i = 0; i < 20; ++i) {
                 for (var j = 0; j < 5; ++j) {
                     PhysicsObjectsFactory.CreateSmallBall(offset + new Vector2(i, j) * 0.3f, world);
                 }
             }
 
-            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 8.5f), true, world);
-            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 6), true, world)
+            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 3.5f), true, world);
+            PhysicsObjectsFactory.CreateAttractor(new Vector2(9, 6), false, world)
                 .Replace(new Player());
         }
 

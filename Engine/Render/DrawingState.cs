@@ -6,10 +6,9 @@ namespace Engine.Render
     {
         public Bitmap bmpBuffer;
         public Graphics gfxBuffer;
-        public Brush RectangleBrush;
-        public Brush CircleBrush;
+        public Brush ColliderBrush;
         public Pen BBoxPen;
-
+        public float CanvasHeight;
         public float MetersToPixels;
         public float PixelsToMeters;
 
@@ -17,10 +16,9 @@ namespace Engine.Render
         {
             bmpBuffer = new Bitmap(width, height);
             gfxBuffer = Graphics.FromImage(bmpBuffer);
-            RectangleBrush = new SolidBrush(Color.Coral);
             BBoxPen = new Pen(Color.White);
-            CircleBrush = new SolidBrush(Color.Silver);
-
+            ColliderBrush = new SolidBrush(Color.Silver);
+            CanvasHeight = height;
             MetersToPixels = 60f;  // 1m = 60px
             PixelsToMeters = 1 / MetersToPixels;
         }

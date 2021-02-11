@@ -16,9 +16,9 @@ namespace Engine.Example.Systems
             var moveSpeed = 60f;  // hardcoded
             var delta = Vector2.Zero;
 
-            if (keys.W) delta.Y -= 1;
+            if (keys.W) delta.Y += 1;
             if (keys.A) delta.X -= 1;
-            if (keys.S) delta.Y += 1;
+            if (keys.S) delta.Y -= 1;
             if (keys.D) delta.X += 1;
 
             delta = delta.Normalized() * moveSpeed * settings.dt;

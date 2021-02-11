@@ -19,35 +19,35 @@ namespace Engine.Render.Systems
         public void Run()
         {
             var mToP = drawingState.MetersToPixels;
+            var canvasHeight = drawingState.CanvasHeight;
 
             foreach (var idx in circles)
                 DrawCircle(
                     circles.Get2(idx).Position * mToP,
                     circles.Get3(idx).Radius * mToP,
                     circles.Get4(idx).Linear * mToP / 4,
-                    drawingState.gfxBuffer);
+                    drawingState.gfxBuffer, canvasHeight);
 
             foreach (var idx in boxes)
                 DrawBox(
                     boxes.Get2(idx).Position * mToP,
                     boxes.Get3(idx).HalfSize * mToP,
-                    drawingState.RectangleBrush, drawingState.gfxBuffer);
+                    drawingState.ColliderBrush, drawingState.gfxBuffer, canvasHeight);
         }
 
-        private static void DrawCircle(Vector2 center, float radius, Vector2 velocity, Graphics gfxBuffer)
+        private static void DrawCircle(Vector2 center, float radius, Vector2 velocity, Graphics gfxBuffer, float canvasHeight)
         {
             var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
             HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
 
             gfxBuffer.FillEllipse(
                 new SolidBrush(Color.FromArgb(255, r, g, b)),
-                center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                center.X - radius, canvasHeight - center.Y - radius, radius * 2, radius * 2);
         }
 
-        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer)
+        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer, float canvasHeight)
         {
-            var topLeft = center - halfSize;
-            gfxBuffer.FillRectangle(brush, topLeft.X, topLeft.Y, halfSize.X * 2, halfSize.Y * 2);
+            gfxBuffer.FillRectangle(brush, center.X - halfSize.X, canvasHeight - center.Y - halfSize.Y, halfSize.X * 2, halfSize.Y * 2);
         }
 
         public static void HsvToRgb(float H, float S, float V, out int r, out int g, out int b)

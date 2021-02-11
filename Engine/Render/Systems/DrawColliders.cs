@@ -17,31 +17,31 @@ namespace Engine.Render.Systems
         public void Run()
         {
             var mToP = drawingState.MetersToPixels;
+            var canvasHeight = drawingState.CanvasHeight;
 
             foreach (var idx in circles)
                 DrawCircle(
                     circles.Get2(idx).Position * mToP,
                     circles.Get3(idx).Radius * mToP,
-                    drawingState.CircleBrush,
-                    drawingState.gfxBuffer);
+                    drawingState.ColliderBrush,
+                    drawingState.gfxBuffer, canvasHeight);
 
             foreach (var idx in boxes)
                 DrawBox(
                     boxes.Get2(idx).Position * mToP,
                     boxes.Get3(idx).HalfSize * mToP,
-                    drawingState.RectangleBrush,
-                    drawingState.gfxBuffer);
+                    drawingState.ColliderBrush,
+                    drawingState.gfxBuffer, canvasHeight);
         }
 
-        private static void DrawCircle(Vector2 center, float radius, Brush brush, Graphics gfxBuffer)
+        private static void DrawCircle(Vector2 center, float radius, Brush brush, Graphics gfxBuffer, float canvasHeight)
         {
-            gfxBuffer.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+            gfxBuffer.FillEllipse(brush, center.X - radius, canvasHeight - center.Y - radius, radius * 2, radius * 2);
         }
 
-        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer)
+        private static void DrawBox(Vector2 center, Vector2 halfSize, Brush brush, Graphics gfxBuffer, float canvasHeight)
         {
-            var topLeft = center - halfSize;
-            gfxBuffer.FillRectangle(brush, topLeft.X, topLeft.Y, 2 * halfSize.X, 2 * halfSize.Y);
+            gfxBuffer.FillRectangle(brush, center.X - halfSize.X, canvasHeight - center.Y - halfSize.Y, halfSize.X * 2, halfSize.Y * 2);
         }
     }
 }
