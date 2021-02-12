@@ -107,6 +107,12 @@ namespace Engine.Example
                 }
             }
 
+            for (var i = 11; i < 14; ++i) {
+                for (var j = 0; j < 2; ++j) {
+                    ObjectsFactory.CreateMediumBall(offset + new Vector2(i, j) * 0.6f, world);
+                }
+            }
+
             ObjectsFactory.CreateAttractor(new Vector2(9, 3.5f), true, world);
             ObjectsFactory.CreateAttractor(new Vector2(9, 6), false, world)
                 .Replace(new Player());

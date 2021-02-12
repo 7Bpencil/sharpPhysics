@@ -14,7 +14,7 @@ namespace Engine.Example
 
         public static EcsEntity CreateMediumBall(Vector2 center, EcsWorld world)
         {
-            return PhysicsObjectsFactory.CreateCircle(center, 0.5f, 2f, 0.95f, false, world);
+            return PhysicsObjectsFactory.CreateCircle(center, 0.3f, 2f, 0.95f, false, world);
         }
 
         public static EcsEntity CreateWall(Vector2 center, float width, float height, EcsWorld world)
