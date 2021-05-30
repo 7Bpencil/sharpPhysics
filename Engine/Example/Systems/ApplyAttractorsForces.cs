@@ -1,44 +1,56 @@
 ﻿using Engine.Example.Components;
 using Engine.Physics;
 using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Example.Systems
 {
-    public class ApplyAttractorsForces : IEcsRunSystem
+    public class ApplyAttractorsForces : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<Attractor, RigidBody, Pose> attractors = null;
-        private EcsFilter<RigidBody, Pose, Velocity>.Exclude<Attractor> bodies = null;
+        private EcsFilter attractors;
+        private EcsFilter bodies;
 
-        private PhysicsSettings settings = null;
-
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var dt = settings.dt;
+            var world = systems.GetWorld();
 
+            attractors = world.Filter<Attractor>().Inc<RigidBody>().Inc<Pose>().End();
+            bodies = world.Filter<RigidBody>().Inc<Pose>().Inc<Velocity>().Exc<Attractor>().End();
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            var sharedData = systems.GetShared<SharedData>();
+            ApplyForces(sharedData.PhysicsSystemData.dt, sharedData.rigidBodies, sharedData.poses, sharedData.velocities);
+        }
+
+        private void ApplyForces(float dt, EcsPool<RigidBody> rigidBodies, EcsPool<Pose> poses, EcsPool<Velocity> velocities)
+        {
             foreach (var idx in bodies)
             {
-                ref var body = ref bodies.Get1(idx);
+                ref var body = ref rigidBodies.Get(idx);
                 if (body.Locked) continue;
 
-                ref var velocity = ref bodies.Get3(idx).Linear;
-                var bodyCenter = bodies.Get2(idx).Position;
+                ref var velocity = ref velocities.Get(idx).Linear;
+                var bodyCenter = poses.Get(idx).Position;
 
                 velocity += CalculateAttractorsInfluence(bodyCenter) * dt;
             }
-        }
 
-        private Vector2 CalculateAttractorsInfluence(Vector2 bodyCenter)
-        {
-            var forces = Vector2.Zero;
-            foreach (var idx in attractors)
+
+            Vector2 CalculateAttractorsInfluence(Vector2 bodyCenter)
             {
-                var diff = attractors.Get3(idx).Position - bodyCenter;
-                var falloffMultiplier = attractors.Get2(idx).Mass / diff.LengthSquared;
-                forces += diff * falloffMultiplier;
-            }
+                var forces = Vector2.Zero;
+                foreach (var idx in attractors)
+                {
+                    var diff = poses.Get(idx).Position - bodyCenter;
+                    var falloffMultiplier = rigidBodies.Get(idx).Mass / diff.LengthSquared;
+                    forces += diff * falloffMultiplier;
+                }
 
-            return forces;
+                return forces;
+            }
         }
+
     }
 }

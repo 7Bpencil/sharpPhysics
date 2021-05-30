@@ -1,28 +1,34 @@
 ﻿using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
     public class CorrectPositions : IEcsRunSystem
     {
-        private PhysicsSystemState state = null;
-
-        public void Run()
+        public void Run(EcsSystems systems)
         {
-            foreach (var manifold in state.Manifolds)
+            var sharedData = systems.GetShared<SharedData>();
+            var physicsData = sharedData.PhysicsSystemData;
+            var rigidBodies = sharedData.rigidBodies;
+            var poses = sharedData.poses;
+
+            foreach (var manifold in physicsData.Manifolds)
             {
-                Correct(manifold);
+                var rigidBodyA = rigidBodies.Get(manifold.BodyA);
+                var rigidBodyB = rigidBodies.Get(manifold.BodyB);
+
+                ref var positionA = ref poses.Get(manifold.BodyA).Position;
+                ref var positionB = ref poses.Get(manifold.BodyB).Position;
+
+                Correct(manifold, rigidBodyA, rigidBodyB, ref positionA, ref positionB);
             }
         }
 
-        private static void Correct(Manifold m)
+        private static void Correct(
+            Manifold m,
+            RigidBody rigidBodyA, RigidBody rigidBodyB,
+            ref Vector2 positionA, ref Vector2 positionB)
         {
-            var rigidBodyA = m.BodyA.Get<RigidBody>();
-            var rigidBodyB = m.BodyB.Get<RigidBody>();
-
-            ref var positionA = ref m.BodyA.Get<Pose>().Position;
-            ref var positionB = ref m.BodyB.Get<Pose>().Position;
-
             const float percent = 0.6F; // usually 20% to 80%
             var correction = m.Normal * (percent * (m.Penetration / (rigidBodyA.IMass + rigidBodyB.IMass)));
 

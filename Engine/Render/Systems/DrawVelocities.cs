@@ -3,43 +3,61 @@ using System.Drawing;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 using Engine.Physics.Helpers;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Render.Systems
 {
-    public class DrawVelocities : IEcsRunSystem
+    public class DrawVelocities : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Pose, Circle, Velocity> circles = null;
-        private EcsFilter<RigidBody, Pose, Box> boxes = null;
+        private EcsFilter circles;
+        private EcsFilter boxes;
 
-        private DrawingState drawingState = null;
-
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var mToP = drawingState.MetersToPixels;
-            var canvasHeight = drawingState.CanvasHeight;
-            var gfxBuffer = drawingState.gfxBuffer;
-            var colliderBrush = drawingState.ColliderBrush;
-            var velocityBrush = drawingState.VelocityBrush;
+            var world = systems.GetWorld();
 
-            foreach (var idx in circles)
+            circles = world.Filter<RigidBody>().Inc<Pose>().Inc<Circle>().Inc<Velocity>().End();
+            boxes = world.Filter<RigidBody>().Inc<Pose>().Inc<Box>().End();
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            var sharedData = systems.GetShared<SharedData>();
+            var drawingData = sharedData.DrawingSystemsData;
+
+            var mToP = drawingData.MetersToPixels;
+            var canvasHeight = drawingData.CanvasHeight;
+            var gfxBuffer = drawingData.gfxBuffer;
+            var colliderBrush = drawingData.ColliderBrush;
+            var velocityBrush = drawingData.VelocityBrush;
+
+            DrawCircles(sharedData.poses, sharedData.circleShapes, sharedData.velocities);
+            DrawBoxes(sharedData.poses, sharedData.boxShapes);
+
+            void DrawCircles(EcsPool<Pose> poses, EcsPool<Circle> circleShapes, EcsPool<Velocity> velocities)
             {
-                var velocity = circles.Get4(idx).Linear * mToP / 4;
-                var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
-                HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
-                velocityBrush.Color = Color.FromArgb(255, r, g, b);
+                foreach (var idx in circles)
+                {
+                    var velocity = velocities.Get(idx).Linear * mToP / 4;
+                    var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
+                    HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
+                    velocityBrush.Color = Color.FromArgb(255, r, g, b);
 
-                Renderer.DrawCircle(
-                    circles.Get2(idx).Position * mToP,
-                    circles.Get3(idx).Radius * mToP,
-                    velocityBrush, gfxBuffer, canvasHeight);
+                    Renderer.DrawCircle(
+                        poses.Get(idx).Position * mToP,
+                        circleShapes.Get(idx).Radius * mToP,
+                        velocityBrush, gfxBuffer, canvasHeight);
+                }
             }
 
-            foreach (var idx in boxes)
-                Renderer.DrawBox(
-                    boxes.Get2(idx).Position * mToP,
-                    boxes.Get3(idx).HalfSize * mToP,
-                    colliderBrush, gfxBuffer, canvasHeight);
+            void DrawBoxes(EcsPool<Pose> poses, EcsPool<Box> boxShapes)
+            {
+                foreach (var idx in boxes)
+                    Renderer.DrawBox(
+                        poses.Get(idx).Position * mToP,
+                        boxShapes.Get(idx).HalfSize * mToP,
+                        colliderBrush, gfxBuffer, canvasHeight);
+            }
         }
 
         public static void HsvToRgb(float H, float S, float V, out int r, out int g, out int b)

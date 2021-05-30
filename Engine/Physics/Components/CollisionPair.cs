@@ -1,10 +1,8 @@
-﻿using Leopotam.Ecs;
-
-namespace Engine.Physics.Components
+﻿namespace Engine.Physics.Components
 {
     public struct CollisionPair
     {
-        public EcsEntity BodyA;
-        public EcsEntity BodyB;
+        public int BodyA;
+        public int BodyB;
     }
 }

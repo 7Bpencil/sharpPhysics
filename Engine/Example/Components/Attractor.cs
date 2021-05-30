@@ -1,6 +1,4 @@
-﻿using Leopotam.Ecs;
-
-namespace Engine.Example.Components
+﻿namespace Engine.Example.Components
 {
-    public struct Attractor : IEcsIgnoreInFilter {}
+    public struct Attractor {}
 }

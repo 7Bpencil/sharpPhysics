@@ -2,52 +2,59 @@
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 using Engine.Physics.Helpers;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
     public class NarrowPhase : IEcsRunSystem
     {
-        private PhysicsSystemState state = null;
-
-        public void Run()
+        public void Run(EcsSystems systems)
         {
-            foreach (var pair in state.CollisionPairs)
-            {
-                if (CalculateManifold(pair.BodyA, pair.BodyB, out var manifold))
+            var sharedData = systems.GetShared<SharedData>();
+            var rigidBodies = sharedData.rigidBodies;
+            var poses = sharedData.poses;
+            var boxes = sharedData.boxShapes;
+            var circles = sharedData.circleShapes;
+            var physicsData = sharedData.PhysicsSystemData;
+
+            foreach (var pair in physicsData.CollisionPairs) {
+                if (CalculateManifold(pair.BodyA, pair.BodyB, rigidBodies, poses, boxes, circles, out var manifold))
                 {
-                    state.Manifolds.Add(manifold);
+                    physicsData.Manifolds.Add(manifold);
                 }
             }
         }
 
-        private static bool CalculateManifold(EcsEntity A, EcsEntity B, out Manifold manifold)
+        private static bool CalculateManifold(
+            int A, int B,
+            EcsPool<RigidBody> rigidBodies, EcsPool<Pose> poses, EcsPool<Box> boxes, EcsPool<Circle> circles,
+            out Manifold manifold)
         {
             manifold = new Manifold {BodyA = A, BodyB = B};
 
-            var typeA = A.Get<RigidBody>().Type;
-            var typeB = B.Get<RigidBody>().Type;
+            var typeA = rigidBodies.Get(A).Type;
+            var typeB = rigidBodies.Get(B).Type;
 
-            var positionA = A.Get<Pose>().Position;
-            var positionB = B.Get<Pose>().Position;
+            var positionA = poses.Get(A).Position;
+            var positionB = poses.Get(B).Position;
 
             switch (GetCollisionType(typeA, typeB))
             {
                 case CollisionType.BoxBox:
                 {
-                    return CollisionDetection.BoxBox(A.Get<Box>(), positionA, B.Get<Box>(), positionB, ref manifold);
+                    return CollisionDetection.BoxBox(boxes.Get(A), positionA, boxes.Get(B), positionB, ref manifold);
                 }
                 case CollisionType.BoxCircle:
                 {
-                    return CollisionDetection.BoxCircle(A.Get<Box>(), positionA, B.Get<Circle>(), positionB, ref manifold);
+                    return CollisionDetection.BoxCircle(boxes.Get(A), positionA, circles.Get(B), positionB, ref manifold);
                 }
                 case CollisionType.CircleBox:
                 {
-                    return CollisionDetection.BoxCircle(B.Get<Box>(), positionB, A.Get<Circle>(), positionA, ref manifold);
+                    return CollisionDetection.BoxCircle(boxes.Get(B), positionB, circles.Get(A), positionA, ref manifold);
                 }
                 case CollisionType.CircleCircle:
                 {
-                    return CollisionDetection.CircleCircle(A.Get<Circle>(), positionA, B.Get<Circle>(), positionB, ref manifold);
+                    return CollisionDetection.CircleCircle(circles.Get(A), positionA, circles.Get(B), positionB, ref manifold);
                 }
                 default: return false;
             }

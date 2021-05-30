@@ -1,34 +1,52 @@
 ﻿using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Render.Systems
 {
-    public class DrawColliders : IEcsRunSystem
+    public class DrawColliders : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Pose, Circle> circles = null;
-        private EcsFilter<RigidBody, Pose, Box> boxes = null;
+        private EcsFilter circles;
+        private EcsFilter boxes;
 
-        private DrawingState drawingState = null;
-
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var mToP = drawingState.MetersToPixels;
-            var canvasHeight = drawingState.CanvasHeight;
-            var gfxBuffer = drawingState.gfxBuffer;
-            var colliderBrush = drawingState.ColliderBrush;
+            var world = systems.GetWorld();
 
-            foreach (var idx in circles)
-                Renderer.DrawCircle(
-                    circles.Get2(idx).Position * mToP,
-                    circles.Get3(idx).Radius * mToP,
-                    colliderBrush, gfxBuffer, canvasHeight);
+            circles = world.Filter<RigidBody>().Inc<Pose>().Inc<Circle>().End();
+            boxes = world.Filter<RigidBody>().Inc<Pose>().Inc<Box>().End();
+        }
 
-            foreach (var idx in boxes)
-                Renderer.DrawBox(
-                    boxes.Get2(idx).Position * mToP,
-                    boxes.Get3(idx).HalfSize * mToP,
-                    colliderBrush, gfxBuffer, canvasHeight);
+        public void Run(EcsSystems systems)
+        {
+            var sharedData = systems.GetShared<SharedData>();
+            var drawingData = sharedData.DrawingSystemsData;
+
+            var mToP = drawingData.MetersToPixels;
+            var canvasHeight = drawingData.CanvasHeight;
+            var gfxBuffer = drawingData.gfxBuffer;
+            var colliderBrush = drawingData.ColliderBrush;
+
+            DrawCircles(sharedData.poses, sharedData.circleShapes);
+            DrawBoxes(sharedData.poses, sharedData.boxShapes);
+
+            void DrawCircles(EcsPool<Pose> poses, EcsPool<Circle> circleShapes)
+            {
+                foreach (var idx in circles)
+                    Renderer.DrawCircle(
+                        poses.Get(idx).Position * mToP,
+                        circleShapes.Get(idx).Radius * mToP,
+                        colliderBrush, gfxBuffer, canvasHeight);
+            }
+
+            void DrawBoxes(EcsPool<Pose> poses, EcsPool<Box> boxShapes)
+            {
+                foreach (var idx in boxes)
+                    Renderer.DrawBox(
+                        poses.Get(idx).Position * mToP,
+                        boxShapes.Get(idx).HalfSize * mToP,
+                        colliderBrush, gfxBuffer, canvasHeight);
+            }
         }
 
     }

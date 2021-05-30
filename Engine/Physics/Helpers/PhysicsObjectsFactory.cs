@@ -1,33 +1,42 @@
 ﻿using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Helpers
 {
-    public static class PhysicsObjectsFactory
+    public class PhysicsObjectsFactory
     {
-        public static EcsEntity CreateCircle(Vector2 center, float radius, float mass, float restitution, bool locked, EcsWorld world)
+        protected SharedData sharedData;
+        protected EcsWorld world;
+
+        public PhysicsObjectsFactory(SharedData sharedData, EcsWorld world)
+        {
+            this.sharedData = sharedData;
+            this.world = world;
+        }
+
+        public int CreateCircle(Vector2 center, float radius, float mass, float restitution, bool locked)
         {
             var e = world.NewEntity();
-            e
-                .Replace(new RigidBody(ColliderType.Circle, mass, restitution, locked))
-                .Replace(new Pose {Position = center})
-                .Replace(new Velocity())
-                .Replace(new Circle {Radius = radius})
-                .Replace(new BoundingBox());
+
+            sharedData.rigidBodies.Add(e) = new RigidBody(ColliderType.Circle, mass, restitution, locked);
+            sharedData.poses.Add(e).Position = center;
+            sharedData.velocities.Add(e);
+            sharedData.circleShapes.Add(e).Radius = radius;
+            sharedData.bboxes.Add(e);
 
             return e;
         }
 
-        public static EcsEntity CreateBox(Vector2 center, float width, float height, float mass, float restitution, bool locked, EcsWorld world)
+        public int CreateBox(Vector2 center, float width, float height, float mass, float restitution, bool locked)
         {
             var e = world.NewEntity();
-            e
-                .Replace(new RigidBody(ColliderType.Box, mass, restitution, locked))
-                .Replace(new Pose {Position = center})
-                .Replace(new Velocity())
-                .Replace(new Box(width, height))
-                .Replace(new BoundingBox());
+
+            sharedData.rigidBodies.Add(e) = new RigidBody(ColliderType.Box, mass, restitution, locked);
+            sharedData.poses.Add(e).Position = center;
+            sharedData.velocities.Add(e);
+            sharedData.boxShapes.Add(e) = new Box(width, height);
+            sharedData.bboxes.Add(e);
 
             return e;
         }

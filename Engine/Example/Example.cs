@@ -4,10 +4,12 @@ using System.Windows.Forms;
 using Engine.Example.Components;
 using Engine.Example.Systems;
 using Engine.Physics;
+using Engine.Physics.Components;
+using Engine.Physics.Components.Shapes;
 using Engine.Physics.Systems;
 using Engine.Render;
 using Engine.Render.Systems;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 
 namespace Engine.Example
@@ -17,25 +19,49 @@ namespace Engine.Example
         public bool W, A, S, D;
     }
 
-    public class Example : Form
+    public sealed class Example : Form
     {
         private EcsWorld world;
         private EcsSystems gameplaySystems;
         private EcsSystems physicsSystems;
         private EcsSystems renderSystems;
-        private PhysicsSettings physicsSettings;
-        private DrawingState drawingState;
+
+        private DrawingSystemsData drawingSystemsData;
+        private PhysicsSystemData physicsSystemData;
         private KeyState keys;
+
+        private ObjectsFactory objectsFactory;
 
         public Example()
         {
             DoubleBuffered = true;
             Size = new Size(900, 720);
-            drawingState = new DrawingState(Size.Width, Size.Height);
-            physicsSettings = new PhysicsSettings();
             keys = new KeyState();
+            drawingSystemsData = new DrawingSystemsData(Size.Width, Size.Height);
+            physicsSystemData = new PhysicsSystemData(
+                1 / 60f,
+                new Vector2(0, -9.80665f),
+                new BoundingBox {Min = new Vector2(-200), Max = new Vector2(200)});
 
-            CreateSystems();
+            world = new EcsWorld();
+            var sharedData = new SharedData
+            {
+                keys = keys,
+                DrawingSystemsData = drawingSystemsData,
+                PhysicsSystemData = physicsSystemData,
+
+                attractors = world.GetPool<Attractor>(),
+                players = world.GetPool<Player>(),
+                rigidBodies = world.GetPool<RigidBody>(),
+                velocities = world.GetPool<Velocity>(),
+                poses = world.GetPool<Pose>(),
+                circleShapes = world.GetPool<Circle>(),
+                boxShapes = world.GetPool<Box>(),
+                bboxes = world.GetPool<BoundingBox>()
+            };
+            objectsFactory = new ObjectsFactory(sharedData, world);
+
+            CreateSystems(sharedData);
             AddObjects();
 
             var timer = new Timer();
@@ -44,24 +70,19 @@ namespace Engine.Example
             timer.Start();
         }
 
-        private void CreateSystems()
+        private void CreateSystems(SharedData sharedData)
         {
-            world = new EcsWorld ();
-
-            gameplaySystems = new EcsSystems(world);
+            gameplaySystems = new EcsSystems(world, sharedData);
             gameplaySystems
                 // user defined logic - physics engine know nothing about gravity, players, or attractors
                 .Add(new InputSystem())
                 .Add(new ApplyGravity())
                 .Add(new ApplyAttractorsForces())
 
-                .Inject(keys)
-                .Inject(physicsSettings)
-
                 .Init();
 
 
-            physicsSystems = new EcsSystems (world);
+            physicsSystems = new EcsSystems(world, sharedData);
             physicsSystems
                 .Add(new UpdateBoundingBoxes())
                 .Add(new BroadPhase())
@@ -72,65 +93,59 @@ namespace Engine.Example
                 .Add(new CleanPhysicsState())
                 .Add(new RemoveLeakedObjects())
 
-                //.Add(new PrintDebug())
-
-                .Inject(physicsSettings)
-                .Inject(new PhysicsSystemState())
-
                 .Init();
 
 
-            renderSystems = new EcsSystems(world);
+            renderSystems = new EcsSystems(world, sharedData);
             renderSystems
                 //.Add(new DrawColliders())
                 .Add(new DrawVelocities())
                 //.Add(new DrawBoundingBoxes())
-
-                .Inject(drawingState)
 
                 .Init();
         }
 
         private void AddObjects()
         {
-            ObjectsFactory.CreateWall(new Vector2(0, 1), new Vector2(1, 11), world);
-            ObjectsFactory.CreateWall(new Vector2(1, 0), new Vector2(14, 1), world);
-            ObjectsFactory.CreateWall(new Vector2(14, 1), new Vector2(15, 11), world);
-            ObjectsFactory.CreateWall(new Vector2(1, 11), new Vector2(14, 12), world);
+            objectsFactory.CreateWall(new Vector2(0, 1), new Vector2(1, 11));
+            objectsFactory.CreateWall(new Vector2(1, 0), new Vector2(14, 1));
+            objectsFactory.CreateWall(new Vector2(14, 1), new Vector2(15, 11));
+            objectsFactory.CreateWall(new Vector2(1, 11), new Vector2(14, 12));
 
-            ObjectsFactory.CreateWall(new Vector2(3, 2.5f), new Vector2(6, 3.5f), world);
+            objectsFactory.CreateWall(new Vector2(3, 2.5f), new Vector2(6, 3.5f));
 
             var offset = new Vector2(2, 7);
             for (var i = 0; i < 20; ++i) {
                 for (var j = 0; j < 5; ++j) {
-                    ObjectsFactory.CreateSmallBall(offset + new Vector2(i, j) * 0.3f, world);
+                    objectsFactory.CreateSmallBall(offset + new Vector2(i, j) * 0.3f);
                 }
             }
 
             for (var i = 11; i < 14; ++i) {
                 for (var j = 0; j < 2; ++j) {
-                    ObjectsFactory.CreateMediumBall(offset + new Vector2(i, j) * 0.6f, world);
+                    objectsFactory.CreateMediumBall(offset + new Vector2(i, j) * 0.6f);
                 }
             }
 
-            ObjectsFactory.CreateAttractor(new Vector2(9, 3.5f), true, world);
-            ObjectsFactory.CreateAttractor(new Vector2(9, 6), false, world)
-                .Replace(new Player());
+            objectsFactory.CreateAttractor(new Vector2(9, 3.5f), true);
+            objectsFactory.MarkAsPlayer(
+                objectsFactory.CreateAttractor(new Vector2(9, 6), false));
         }
 
         private void GameLoop(object sender, EventArgs args)
         {
             gameplaySystems.Run();
             physicsSystems.Run();
+
             Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            drawingState.gfxBuffer.Clear(Color.Black);
+            drawingSystemsData.gfxBuffer.Clear(Color.Black);
             renderSystems.Run();
 
-            e.Graphics.DrawImage(drawingState.bmpBuffer, Point.Empty);
+            e.Graphics.DrawImage(drawingSystemsData.bmpBuffer, Point.Empty);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -177,5 +192,6 @@ namespace Engine.Example
 
             base.OnKeyUp(e);
         }
+
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Engine.Render
 {
-    public class DrawingState
+    public class DrawingSystemsData
     {
         public Bitmap bmpBuffer;
         public Graphics gfxBuffer;
@@ -13,7 +13,7 @@ namespace Engine.Render
         public float MetersToPixels;
         public float PixelsToMeters;
 
-        public DrawingState(int width, int height)
+        public DrawingSystemsData(int width, int height)
         {
             bmpBuffer = new Bitmap(width, height);
             gfxBuffer = Graphics.FromImage(bmpBuffer);
@@ -24,5 +24,6 @@ namespace Engine.Render
             MetersToPixels = 60f;  // 1m = 60px
             PixelsToMeters = 1 / MetersToPixels;
         }
+
     }
 }

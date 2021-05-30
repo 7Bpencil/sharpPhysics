@@ -1,24 +1,34 @@
 ﻿using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Render.Systems
 {
-    public class DrawBoundingBoxes : IEcsRunSystem
+    public class DrawBoundingBoxes : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<BoundingBox> boundingBoxes = null;
+        private EcsFilter boundingBoxes;
 
-        private DrawingState drawingState = null;
-
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var mToP = drawingState.MetersToPixels;
-            var canvasHeight = drawingState.CanvasHeight;
-            var gfxBuffer = drawingState.gfxBuffer;
-            var bboxPen = drawingState.BBoxPen;
+            var world = systems.GetWorld();
+
+            boundingBoxes = world.Filter<BoundingBox>().End();
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            var sharedData = systems.GetShared<SharedData>();
+            var drawingData = sharedData.DrawingSystemsData;
+
+            var mToP = drawingData.MetersToPixels;
+            var canvasHeight = drawingData.CanvasHeight;
+            var gfxBuffer = drawingData.gfxBuffer;
+            var bboxPen = drawingData.BBoxPen;
+
+            var bboxes = sharedData.bboxes;
 
             foreach (var idx in boundingBoxes)
             {
-                var bbox = boundingBoxes.Get1(idx);
+                ref var bbox = ref bboxes.Get(idx);
                 Renderer.DrawBoundingBox(
                     bbox.Min * mToP,
                     bbox.Max * mToP,

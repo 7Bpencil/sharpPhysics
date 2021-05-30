@@ -1,21 +1,31 @@
 ﻿using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
-    public class RemoveLeakedObjects : IEcsRunSystem
+    public class RemoveLeakedObjects : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<RigidBody, BoundingBox> bodies = null;
+        private EcsFilter bodies;
 
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var boundaries = new BoundingBox {Min = new Vector2(-200), Max = new Vector2(200)};
+            var world = systems.GetWorld();
 
-            foreach (var idx in bodies)
-            {
-                if (!BoundingBox.Intersects(ref bodies.Get2(idx), ref boundaries))
+            bodies = world.Filter<RigidBody>().Inc<BoundingBox>().End();
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            var world = systems.GetWorld();
+            var sharedData = systems.GetShared<SharedData>();
+            var boundaries = sharedData.PhysicsSystemData.Boundaries;
+
+            var bboxes = sharedData.bboxes;
+
+            foreach (var idx in bodies) {
+                if (!BoundingBox.Intersects(in bboxes.Get(idx), in boundaries))
                 {
-                    bodies.GetEntity(idx).Destroy();
+                    world.DelEntity(idx);
                 }
             }
         }

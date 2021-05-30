@@ -1,15 +1,15 @@
-﻿using Leopotam.Ecs;
+﻿using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
     public class CleanPhysicsState : IEcsRunSystem
     {
-        private PhysicsSystemState state = null;
-
-        public void Run()
+        public void Run(EcsSystems systems)
         {
-            state.CollisionPairs.Clear();
-            state.Manifolds.Clear();
+            var physicsData = systems.GetShared<SharedData>().PhysicsSystemData;
+
+            physicsData.CollisionPairs.Clear();
+            physicsData.Manifolds.Clear();
         }
     }
 }

@@ -1,36 +1,46 @@
-﻿using Engine.Example.Components;
-using Engine.Physics;
+﻿using Engine.Physics;
 using Engine.Physics.Helpers;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Example
 {
-    public static class ObjectsFactory
+    public class ObjectsFactory : PhysicsObjectsFactory
     {
-        public static EcsEntity CreateSmallBall(Vector2 center, EcsWorld world)
+        public ObjectsFactory(SharedData sharedData, EcsWorld world) : base(sharedData, world) { }
+
+        public int CreateSmallBall(Vector2 center)
         {
-            return PhysicsObjectsFactory.CreateCircle(center, 0.15f, 1f, 0.7f, false, world);
+            return CreateCircle(center, 0.15f, 1f, 0.7f, false);
         }
 
-        public static EcsEntity CreateMediumBall(Vector2 center, EcsWorld world)
+        public int CreateMediumBall(Vector2 center)
         {
-            return PhysicsObjectsFactory.CreateCircle(center, 0.3f, 2f, 0.95f, false, world);
+            return CreateCircle(center, 0.3f, 2f, 0.95f, false);
         }
 
-        public static EcsEntity CreateWall(Vector2 center, float width, float height, EcsWorld world)
+        public int CreateWall(Vector2 center, float width, float height)
         {
-            return PhysicsObjectsFactory.CreateBox(center, width, height, 1000f, 0.95f, true, world);
+            return CreateBox(center, width, height, 1000f, 0.95f, true);
         }
 
-        public static EcsEntity CreateWall(Vector2 min, Vector2 max, EcsWorld world)
+        public int CreateWall(Vector2 min, Vector2 max)
         {
-            return CreateWall((min + max) / 2, max.X - min.X, max.Y - min.Y, world);
+            return CreateWall((min + max) / 2, max.X - min.X, max.Y - min.Y);
         }
 
-        public static EcsEntity CreateAttractor(Vector2 center, bool locked, EcsWorld world)
+        public int CreateAttractor(Vector2 center, bool locked)
         {
-            return PhysicsObjectsFactory.CreateCircle(center, 0.7f, 20f, 0.95f, locked, world)
-                .Replace(new Attractor());
+            var e = CreateCircle(center, 0.7f, 20f, 0.95f, locked);
+            sharedData.attractors.Add(e);
+
+            return e;
         }
+
+        public int MarkAsPlayer(int e)
+        {
+            sharedData.players.Add(e);
+            return e;
+        }
+
     }
 }

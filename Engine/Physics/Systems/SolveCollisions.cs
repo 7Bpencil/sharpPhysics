@@ -1,41 +1,40 @@
 ﻿using System;
 using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
     public class SolveCollisions : IEcsRunSystem
     {
-        private PhysicsSystemState state = null;
-
-        public void Run()
+        public void Run(EcsSystems systems)
         {
-            foreach (var manifold in state.Manifolds)
+            var sharedData = systems.GetShared<SharedData>();
+            var rigidBodies = sharedData.rigidBodies;
+            var velocities = sharedData.velocities;
+            var physicsData = sharedData.PhysicsSystemData;
+
+            foreach (var manifold in physicsData.Manifolds)
             {
-                ResolveCollision(manifold);
+                ref var velocityA = ref velocities.Get(manifold.BodyA).Linear;
+                ref var velocityB = ref velocities.Get(manifold.BodyB).Linear;
+
+                var rigidBodyA = rigidBodies.Get(manifold.BodyA);
+                var rigidBodyB = rigidBodies.Get(manifold.BodyB);
+
+                ResolveCollision(manifold, ref velocityA, ref velocityB, rigidBodyA, rigidBodyB);
             }
         }
 
-        private static void ResolveCollision(Manifold m)
+        private static void ResolveCollision(
+            Manifold m,
+            ref Vector2 velocityA, ref Vector2 velocityB,
+            RigidBody rigidBodyA, RigidBody rigidBodyB)
         {
-            ref var velocityA = ref m.BodyA.Get<Velocity>().Linear;
-            ref var velocityB = ref m.BodyB.Get<Velocity>().Linear;
-
-            var rigidBodyA = m.BodyA.Get<RigidBody>();
-            var rigidBodyB = m.BodyB.Get<RigidBody>();
-
-
-            if (float.IsNaN(m.Normal.X + m.Normal.Y))
-            {
-                return;
-            }
+            if (float.IsNaN(m.Normal.X + m.Normal.Y)) return;
 
             var velAlongNormal = Vector2.Dot(velocityB - velocityA, m.Normal);
 
-            if (velAlongNormal > 0)
-            {
-                return;
-            }
+            if (velAlongNormal > 0) return;
 
             var e = Math.Min(rigidBodyA.Restitution, rigidBodyB.Restitution);
             var j = -(1 + e) * velAlongNormal / (rigidBodyA.IMass + rigidBodyB.IMass);

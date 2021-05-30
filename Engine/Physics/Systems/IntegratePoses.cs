@@ -1,22 +1,31 @@
 ﻿using Engine.Physics.Components;
-using Leopotam.Ecs;
+using Leopotam.EcsLite;
 
 namespace Engine.Physics.Systems
 {
-    public class IntegratePoses : IEcsRunSystem
+    public class IntegratePoses : IEcsInitSystem, IEcsRunSystem
     {
-        private EcsFilter<RigidBody, Pose, Velocity> bodies = null;
+        private EcsFilter bodies;
 
-        private PhysicsSettings settings = null;
-
-        public void Run()
+        public void Init(EcsSystems systems)
         {
-            var dt = settings.dt;
+            var world = systems.GetWorld();
+
+            bodies = world.Filter<RigidBody>().Inc<Pose>().Inc<Velocity>().End();
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            var sharedData = systems.GetShared<SharedData>();
+            var dt = sharedData.PhysicsSystemData.dt;
+
+            var poses = sharedData.poses;
+            var velocities = sharedData.velocities;
 
             foreach (var idx in bodies)
             {
-                ref var pose = ref bodies.Get2(idx);
-                ref var velocity = ref bodies.Get3(idx).Linear;
+                ref var pose = ref poses.Get(idx);
+                ref var velocity = ref velocities.Get(idx).Linear;
                 pose.Position += velocity * dt;
             }
         }

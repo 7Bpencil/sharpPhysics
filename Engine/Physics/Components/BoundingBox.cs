@@ -11,9 +11,9 @@ namespace Engine.Physics.Components
         public Vector2 Max;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Intersects(ref BoundingBox a, ref BoundingBox b)
+        public static bool Intersects(in BoundingBox a, in BoundingBox b)
         {
-            return Intersects(a.Min, a.Max, b.Min, b.Max);
+            return Intersects(in a.Min, in a.Max, in b.Min, in b.Max);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -22,5 +22,6 @@ namespace Engine.Physics.Components
             return maxA.X >= minB.X & maxA.Y >= minB.Y &
                    maxB.X >= minA.X & maxB.Y >= minA.Y;
         }
+
     }
 }
