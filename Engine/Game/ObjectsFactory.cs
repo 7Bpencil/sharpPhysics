@@ -1,8 +1,8 @@
-﻿using Engine.Physics;
+﻿using Leopotam.EcsLite;
+using Engine.Physics;
 using Engine.Physics.Helpers;
-using Leopotam.EcsLite;
 
-namespace Engine.Example
+namespace Engine.Game
 {
     public class ObjectsFactory : PhysicsObjectsFactory
     {

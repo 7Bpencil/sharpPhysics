@@ -4,7 +4,6 @@
     {
         public int BodyA;
         public int BodyB;
-
         public float Penetration;
         public Vector2 Normal;
     }

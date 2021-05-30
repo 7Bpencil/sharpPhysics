@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows.Forms;
+using Engine.Game;
 
 namespace Engine
 {
     static class Program
     {
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            Application.Run(new Example.Example());
+            Application.Run(new MainForm());
         }
     }
 }

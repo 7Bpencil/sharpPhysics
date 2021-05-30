@@ -8,13 +8,11 @@ namespace Engine.Physics.Components
         public float Restitution;
         public float Mass;
         public float IMass;
-        public ColliderType Type;
 
-        public RigidBody(ColliderType type, float mass, float restitution, bool locked) : this()
+        public RigidBody(float mass, float restitution, bool locked)
         {
-            if (mass <= 0) throw new ArgumentException();
+            if (mass <= 0) throw new ArgumentException("mass can't be negative");
 
-            Type = type;
             Mass = mass;
             IMass = 1 / mass;
             Restitution = restitution;
@@ -22,17 +20,4 @@ namespace Engine.Physics.Components
         }
     }
 
-    public enum ColliderType
-    {
-        Circle = 1,
-        Box = 2
-    }
-
-    public enum CollisionType
-    {
-        CircleCircle = ColliderType.Circle * 10 + ColliderType.Circle,
-        BoxBox       = ColliderType.Box * 10 + ColliderType.Box,
-        CircleBox    = ColliderType.Circle * 10 + ColliderType.Box,
-        BoxCircle    = ColliderType.Box * 10 + ColliderType.Circle
-    }
 }

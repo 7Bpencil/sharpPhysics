@@ -1,5 +1,5 @@
-﻿using Engine.Physics.Components;
-using Leopotam.EcsLite;
+﻿using Leopotam.EcsLite;
+using Engine.Physics.Components;
 
 namespace Engine.Physics.Systems
 {
@@ -25,6 +25,7 @@ namespace Engine.Physics.Systems
             foreach (var idx in bodies) {
                 if (!BoundingBox.Intersects(in bboxes.Get(idx), in boundaries))
                 {
+                    // world is not perfect...
                     world.DelEntity(idx);
                 }
             }

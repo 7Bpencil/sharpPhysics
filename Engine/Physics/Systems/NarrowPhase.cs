@@ -1,8 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using Leopotam.EcsLite;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Engine.Physics.Helpers;
-using Leopotam.EcsLite;
+using CD = Engine.Physics.Helpers.CollisionDetection;
 
 namespace Engine.Physics.Systems
 {
@@ -11,60 +11,49 @@ namespace Engine.Physics.Systems
         public void Run(EcsSystems systems)
         {
             var sharedData = systems.GetShared<SharedData>();
-            var rigidBodies = sharedData.rigidBodies;
             var poses = sharedData.poses;
             var boxes = sharedData.boxShapes;
             var circles = sharedData.circleShapes;
             var physicsData = sharedData.PhysicsSystemData;
 
-            foreach (var pair in physicsData.CollisionPairs) {
-                if (CalculateManifold(pair.BodyA, pair.BodyB, rigidBodies, poses, boxes, circles, out var manifold))
-                {
-                    physicsData.Manifolds.Add(manifold);
-                }
-            }
-        }
-
-        private static bool CalculateManifold(
-            int A, int B,
-            EcsPool<RigidBody> rigidBodies, EcsPool<Pose> poses, EcsPool<Box> boxes, EcsPool<Circle> circles,
-            out Manifold manifold)
-        {
-            manifold = new Manifold {BodyA = A, BodyB = B};
-
-            var typeA = rigidBodies.Get(A).Type;
-            var typeB = rigidBodies.Get(B).Type;
-
-            var positionA = poses.Get(A).Position;
-            var positionB = poses.Get(B).Position;
-
-            switch (GetCollisionType(typeA, typeB))
+            foreach (var pair in physicsData.CollisionPairs)
             {
-                case CollisionType.BoxBox:
-                {
-                    return CollisionDetection.BoxBox(boxes.Get(A), positionA, boxes.Get(B), positionB, ref manifold);
-                }
-                case CollisionType.BoxCircle:
-                {
-                    return CollisionDetection.BoxCircle(boxes.Get(A), positionA, circles.Get(B), positionB, ref manifold);
-                }
-                case CollisionType.CircleBox:
-                {
-                    return CollisionDetection.BoxCircle(boxes.Get(B), positionB, circles.Get(A), positionA, ref manifold);
-                }
-                case CollisionType.CircleCircle:
-                {
-                    return CollisionDetection.CircleCircle(circles.Get(A), positionA, circles.Get(B), positionB, ref manifold);
-                }
-                default: return false;
+                var A = pair.BodyA;
+                var B = pair.BodyB;
+                var positionA = poses.Get(A).Position;
+                var positionB = poses.Get(B).Position;
+
+                CalculateManifolds(A, B, positionA, positionB, boxes, circles, physicsData.Manifolds);
             }
         }
 
-
-        [MethodImpl (MethodImplOptions.AggressiveInlining)]
-        private static CollisionType GetCollisionType(ColliderType a, ColliderType b)
+        private static void CalculateManifolds(
+            int A, int B, Vector2 positionA, Vector2 positionB, EcsPool<Box> boxes, EcsPool<Circle> circles, List<Manifold> manifolds)
         {
-            return (CollisionType) ((int) a * 10 + (int) b);
+            var isBoxA = boxes.Has(A);
+            var isBoxB = boxes.Has(B);
+            var isCircleA = circles.Has(A);
+            var isCircleB = circles.Has(B);
+
+            // yeah, entity can have a circle and box components at the same time
+            var manifold = new Manifold {BodyA = A, BodyB = B};
+            if (isBoxA && isBoxB && CD.BoxBox(boxes.Get(A), positionA, boxes.Get(B), positionB, ref manifold))
+            {
+                manifolds.Add(manifold);
+            }
+            if (isBoxA && isCircleB && CD.BoxCircle(boxes.Get(A), positionA, circles.Get(B), positionB, ref manifold))
+            {
+                manifolds.Add(manifold);
+            }
+            if (isBoxB && isCircleA && CD.BoxCircle(boxes.Get(B), positionB, circles.Get(A), positionA, ref manifold))
+            {
+                manifolds.Add(manifold);
+            }
+            if (isCircleB && isCircleA && CD.CircleCircle(circles.Get(A), positionA, circles.Get(B), positionB, ref manifold))
+            {
+                manifolds.Add(manifold);
+            }
         }
+
     }
 }

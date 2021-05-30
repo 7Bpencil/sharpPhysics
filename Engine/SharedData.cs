@@ -1,10 +1,10 @@
-﻿using Engine.Example;
-using Engine.Example.Components;
+﻿using Leopotam.EcsLite;
+using Engine.Game;
+using Engine.Game.Components;
 using Engine.Physics;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 using Engine.Render;
-using Leopotam.EcsLite;
 
 namespace Engine
 {

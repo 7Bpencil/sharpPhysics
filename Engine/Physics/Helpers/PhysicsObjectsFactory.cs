@@ -1,6 +1,6 @@
-﻿using Engine.Physics.Components;
+﻿using Leopotam.EcsLite;
+using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
-using Leopotam.EcsLite;
 
 namespace Engine.Physics.Helpers
 {
@@ -19,7 +19,7 @@ namespace Engine.Physics.Helpers
         {
             var e = world.NewEntity();
 
-            sharedData.rigidBodies.Add(e) = new RigidBody(ColliderType.Circle, mass, restitution, locked);
+            sharedData.rigidBodies.Add(e) = new RigidBody(mass, restitution, locked);
             sharedData.poses.Add(e).Position = center;
             sharedData.velocities.Add(e);
             sharedData.circleShapes.Add(e).Radius = radius;
@@ -32,7 +32,7 @@ namespace Engine.Physics.Helpers
         {
             var e = world.NewEntity();
 
-            sharedData.rigidBodies.Add(e) = new RigidBody(ColliderType.Box, mass, restitution, locked);
+            sharedData.rigidBodies.Add(e) = new RigidBody(mass, restitution, locked);
             sharedData.poses.Add(e).Position = center;
             sharedData.velocities.Add(e);
             sharedData.boxShapes.Add(e) = new Box(width, height);

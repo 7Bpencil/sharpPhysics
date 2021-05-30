@@ -2,7 +2,6 @@
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 
-
 namespace Engine.Physics.Helpers
 {
     public static class CollisionDetection

@@ -1,5 +1,5 @@
-﻿using Engine.Physics.Components;
-using Leopotam.EcsLite;
+﻿using Leopotam.EcsLite;
+using Engine.Physics.Components;
 
 namespace Engine.Physics.Systems
 {
@@ -19,15 +19,19 @@ namespace Engine.Physics.Systems
             var sharedData = systems.GetShared<SharedData>();
             var pairs = sharedData.PhysicsSystemData.CollisionPairs;
             var bboxes = sharedData.bboxes;
-            var bodiesCount = bodies.GetEntitiesCount();
 
-            // TODO don't do that, use foreach or something smart
-            for (var i = 0; i < bodiesCount; ++i) {
-                for (var k = i + 1; k < bodiesCount; ++k)
+            // don't do that, use foreach or something smarter
+            var entities = bodies.GetRawEntities();
+            var entitiesCount = bodies.GetEntitiesCount();
+            for (var idx = 0; idx < entitiesCount; ++idx) {
+                for (var idy = idx + 1; idy < entitiesCount; ++idy)
                 {
-                    if (BoundingBox.Intersects(in bboxes.Get(i), in bboxes.Get(k)))
+                    var A = entities[idx];
+                    var B = entities[idy];
+
+                    if (BoundingBox.Intersects(in bboxes.Get(A), in bboxes.Get(B)))
                     {
-                        pairs.Add(new CollisionPair {BodyA = i, BodyB = k});
+                        pairs.Add(new CollisionPair {BodyA = A, BodyB = B});
                     }
                 }
             }

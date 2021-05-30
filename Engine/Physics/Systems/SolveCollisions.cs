@@ -1,6 +1,6 @@
 ﻿using System;
-using Engine.Physics.Components;
 using Leopotam.EcsLite;
+using Engine.Physics.Components;
 
 namespace Engine.Physics.Systems
 {

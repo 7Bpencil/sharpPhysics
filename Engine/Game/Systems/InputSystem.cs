@@ -1,9 +1,9 @@
-using Engine.Example.Components;
+using Engine.Game.Components;
+using Leopotam.EcsLite;
 using Engine.Physics;
 using Engine.Physics.Components;
-using Leopotam.EcsLite;
 
-namespace Engine.Example.Systems
+namespace Engine.Game.Systems
 {
     public class InputSystem : IEcsInitSystem, IEcsRunSystem
     {
@@ -20,11 +20,17 @@ namespace Engine.Example.Systems
         {
             var movementSpeed = 60f;  // hardcoded
             var sharedData = systems.GetShared<SharedData>();
+            var velocities = sharedData.velocities;
+
             var velocityDelta = GetVelocityDelta(sharedData.keys, movementSpeed, sharedData.PhysicsSystemData.dt);
-            UpdatePlayersVelocities(velocityDelta, sharedData.velocities);
+            foreach (var idx in players)
+            {
+                ref var velocity = ref velocities.Get(idx);
+                velocity.Linear += velocityDelta;
+            }
         }
 
-        private Vector2 GetVelocityDelta(KeyState keys, float movementSpeed, float dt)
+        private static Vector2 GetVelocityDelta(KeyState keys, float movementSpeed, float dt)
         {
             var velocityDelta = Vector2.Zero;
 
@@ -34,15 +40,6 @@ namespace Engine.Example.Systems
             if (keys.D) velocityDelta.X += 1;
 
             return velocityDelta.Normalized() * movementSpeed * dt;
-        }
-
-        private void UpdatePlayersVelocities(Vector2 delta, EcsPool<Velocity> velocities)
-        {
-            foreach (var idx in players)
-            {
-                ref var velocity = ref velocities.Get(idx);
-                velocity.Linear += delta;
-            }
         }
 
     }

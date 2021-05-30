@@ -1,9 +1,9 @@
-﻿using Engine.Example.Components;
+﻿using Engine.Game.Components;
+using Leopotam.EcsLite;
 using Engine.Physics;
 using Engine.Physics.Components;
-using Leopotam.EcsLite;
 
-namespace Engine.Example.Systems
+namespace Engine.Game.Systems
 {
     public class ApplyAttractorsForces : IEcsInitSystem, IEcsRunSystem
     {
@@ -28,8 +28,7 @@ namespace Engine.Example.Systems
         {
             foreach (var idx in bodies)
             {
-                ref var body = ref rigidBodies.Get(idx);
-                if (body.Locked) continue;
+                if (rigidBodies.Get(idx).Locked) continue;
 
                 ref var velocity = ref velocities.Get(idx).Linear;
                 var bodyCenter = poses.Get(idx).Position;

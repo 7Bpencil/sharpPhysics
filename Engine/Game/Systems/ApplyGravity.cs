@@ -1,9 +1,8 @@
-﻿using Engine.Example.Components;
-using Engine.Physics;
-using Engine.Physics.Components;
+﻿using Engine.Game.Components;
 using Leopotam.EcsLite;
+using Engine.Physics.Components;
 
-namespace Engine.Example.Systems
+namespace Engine.Game.Systems
 {
     public class ApplyGravity : IEcsInitSystem, IEcsRunSystem
     {
@@ -21,19 +20,15 @@ namespace Engine.Example.Systems
             var sharedData = systems.GetShared<SharedData>();
             var physicsData = sharedData.PhysicsSystemData;
             var gravityDt = physicsData.Gravity * physicsData.dt;
+            var rigidBodies = sharedData.rigidBodies;
+            var velocities = sharedData.velocities;
 
-            ApplyForce(gravityDt, sharedData.rigidBodies, sharedData.velocities);
-        }
-
-        private void ApplyForce(Vector2 velocityDelta, EcsPool<RigidBody> rigidBodies, EcsPool<Velocity> velocities)
-        {
             foreach (var idx in bodies)
             {
-                ref var body = ref rigidBodies.Get(idx);
-                if (body.Locked) continue;
+                if (rigidBodies.Get(idx).Locked) continue;
 
                 ref var velocity = ref velocities.Get(idx).Linear;
-                velocity += velocityDelta;
+                velocity += gravityDt;
             }
         }
 

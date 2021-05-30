@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Engine.Example.Components;
-using Engine.Example.Systems;
+using Engine.Game.Components;
+using Leopotam.EcsLite;
+using Engine.Game.Systems;
 using Engine.Physics;
 using Engine.Physics.Components;
 using Engine.Physics.Components.Shapes;
 using Engine.Physics.Systems;
 using Engine.Render;
 using Engine.Render.Systems;
-using Leopotam.EcsLite;
 
-
-namespace Engine.Example
+namespace Engine.Game
 {
     public class KeyState
     {
         public bool W, A, S, D;
     }
 
-    public sealed class Example : Form
+    public sealed class MainForm : Form
     {
         private EcsWorld world;
         private EcsSystems gameplaySystems;
@@ -32,7 +31,7 @@ namespace Engine.Example
 
         private ObjectsFactory objectsFactory;
 
-        public Example()
+        public MainForm()
         {
             DoubleBuffered = true;
             Size = new Size(900, 720);
@@ -74,7 +73,7 @@ namespace Engine.Example
         {
             gameplaySystems = new EcsSystems(world, sharedData);
             gameplaySystems
-                // user defined logic - physics engine know nothing about gravity, players, or attractors
+                // user defined logic - physics engine knows nothing about gravity, players, or attractors
                 .Add(new InputSystem())
                 .Add(new ApplyGravity())
                 .Add(new ApplyAttractorsForces())
@@ -98,9 +97,9 @@ namespace Engine.Example
 
             renderSystems = new EcsSystems(world, sharedData);
             renderSystems
-                //.Add(new DrawColliders())
+                // .Add(new DrawColliders())
                 .Add(new DrawVelocities())
-                //.Add(new DrawBoundingBoxes())
+                // .Add(new DrawBoundingBoxes())
 
                 .Init();
         }
@@ -142,10 +141,10 @@ namespace Engine.Example
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            drawingSystemsData.gfxBuffer.Clear(Color.Black);
-            renderSystems.Run();
+            drawingSystemsData.gfxBuffer = e.Graphics;
+            e.Graphics.Clear(Color.Black);
 
-            e.Graphics.DrawImage(drawingSystemsData.bmpBuffer, Point.Empty);
+            renderSystems.Run();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
