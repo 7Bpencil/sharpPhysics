@@ -22,11 +22,11 @@ namespace Engine.Physics.Systems
 
             var bboxes = sharedData.bboxes;
 
-            foreach (var idx in bodies) {
-                if (!BoundingBox.Intersects(in bboxes.Get(idx), in boundaries))
+            foreach (var entity in bodies) {
+                if (!BoundingBox.Intersects(in bboxes.Get(entity), in boundaries))
                 {
                     // world is not perfect...
-                    world.DelEntity(idx);
+                    world.DelEntity(entity);
                 }
             }
         }

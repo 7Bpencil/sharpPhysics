@@ -4,7 +4,7 @@ using Engine.Game;
 
 namespace Engine
 {
-    static class Program
+    internal static class Program
     {
         [STAThread]
         private static void Main()

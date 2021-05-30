@@ -26,9 +26,9 @@ namespace Engine.Render.Systems
 
             var bboxes = sharedData.bboxes;
 
-            foreach (var idx in boundingBoxes)
+            foreach (var entity in boundingBoxes)
             {
-                ref var bbox = ref bboxes.Get(idx);
+                ref var bbox = ref bboxes.Get(entity);
                 Renderer.DrawBoundingBox(
                     bbox.Min * mToP,
                     bbox.Max * mToP,

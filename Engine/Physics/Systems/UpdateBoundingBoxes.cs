@@ -26,11 +26,11 @@ namespace Engine.Physics.Systems
 
         private void UpdateCircles(EcsPool<Pose> poses, EcsPool<Circle> circleShapes, EcsPool<BoundingBox> bboxes)
         {
-            foreach (var idx in circles)
+            foreach (var entity in circles)
             {
-                var center = poses.Get(idx).Position;
-                var radius = circleShapes.Get(idx).Radius;
-                ref var bbox = ref bboxes.Get(idx);
+                var center = poses.Get(entity).Position;
+                var radius = circleShapes.Get(entity).Radius;
+                ref var bbox = ref bboxes.Get(entity);
 
                 var radiusVector = new Vector2(radius);
                 bbox.Min = center - radiusVector;
@@ -40,11 +40,11 @@ namespace Engine.Physics.Systems
 
         private void UpdateBoxes(EcsPool<Pose> poses, EcsPool<Box> boxShapes, EcsPool<BoundingBox> bboxes)
         {
-            foreach (var idx in boxes)
+            foreach (var entity in boxes)
             {
-                var center = poses.Get(idx).Position;
-                var halfSize = boxShapes.Get(idx).HalfSize;
-                ref var bbox = ref bboxes.Get(idx);
+                var center = poses.Get(entity).Position;
+                var halfSize = boxShapes.Get(entity).HalfSize;
+                ref var bbox = ref bboxes.Get(entity);
 
                 bbox.Min = center - halfSize;
                 bbox.Max = center + halfSize;

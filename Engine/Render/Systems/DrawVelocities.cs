@@ -36,26 +36,26 @@ namespace Engine.Render.Systems
 
             void DrawCircles(EcsPool<Pose> poses, EcsPool<Circle> circleShapes, EcsPool<Velocity> velocities)
             {
-                foreach (var idx in circles)
+                foreach (var entity in circles)
                 {
-                    var velocity = velocities.Get(idx).Linear * mToP / 4;
+                    var velocity = velocities.Get(entity).Linear * mToP / 4;
                     var particleSpeed = 220 - Math.Min((int) velocity.Length, 220);
                     HsvToRgb(particleSpeed, 1, 1, out var r, out var g, out var b);
                     velocityBrush.Color = Color.FromArgb(255, r, g, b);
 
                     Renderer.DrawCircle(
-                        poses.Get(idx).Position * mToP,
-                        circleShapes.Get(idx).Radius * mToP,
+                        poses.Get(entity).Position * mToP,
+                        circleShapes.Get(entity).Radius * mToP,
                         velocityBrush, gfxBuffer, canvasHeight);
                 }
             }
 
             void DrawBoxes(EcsPool<Pose> poses, EcsPool<Box> boxShapes)
             {
-                foreach (var idx in boxes)
+                foreach (var entity in boxes)
                     Renderer.DrawBox(
-                        poses.Get(idx).Position * mToP,
-                        boxShapes.Get(idx).HalfSize * mToP,
+                        poses.Get(entity).Position * mToP,
+                        boxShapes.Get(entity).HalfSize * mToP,
                         colliderBrush, gfxBuffer, canvasHeight);
             }
         }

@@ -22,10 +22,10 @@ namespace Engine.Physics.Systems
             var poses = sharedData.poses;
             var velocities = sharedData.velocities;
 
-            foreach (var idx in bodies)
+            foreach (var entity in bodies)
             {
-                ref var pose = ref poses.Get(idx);
-                ref var velocity = ref velocities.Get(idx).Linear;
+                ref var pose = ref poses.Get(entity);
+                ref var velocity = ref velocities.Get(entity).Linear;
                 pose.Position += velocity * dt;
             }
         }

@@ -23,9 +23,9 @@ namespace Engine.Game.Systems
             var velocities = sharedData.velocities;
 
             var velocityDelta = GetVelocityDelta(sharedData.keys, movementSpeed, sharedData.PhysicsSystemData.dt);
-            foreach (var idx in players)
+            foreach (var entity in players)
             {
-                ref var velocity = ref velocities.Get(idx);
+                ref var velocity = ref velocities.Get(entity);
                 velocity.Linear += velocityDelta;
             }
         }

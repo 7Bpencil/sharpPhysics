@@ -26,12 +26,11 @@ namespace Engine.Game.Systems
 
         private void ApplyForces(float dt, EcsPool<RigidBody> rigidBodies, EcsPool<Pose> poses, EcsPool<Velocity> velocities)
         {
-            foreach (var idx in bodies)
+            foreach (var entity in bodies)
             {
-                if (rigidBodies.Get(idx).Locked) continue;
-
-                ref var velocity = ref velocities.Get(idx).Linear;
-                var bodyCenter = poses.Get(idx).Position;
+                if (rigidBodies.Get(entity).Locked) continue;
+                ref var velocity = ref velocities.Get(entity).Linear;
+                var bodyCenter = poses.Get(entity).Position;
 
                 velocity += CalculateAttractorsInfluence(bodyCenter) * dt;
             }
@@ -40,10 +39,10 @@ namespace Engine.Game.Systems
             Vector2 CalculateAttractorsInfluence(Vector2 bodyCenter)
             {
                 var forces = Vector2.Zero;
-                foreach (var idx in attractors)
+                foreach (var entity in attractors)
                 {
-                    var diff = poses.Get(idx).Position - bodyCenter;
-                    var falloffMultiplier = rigidBodies.Get(idx).Mass / diff.LengthSquared;
+                    var diff = poses.Get(entity).Position - bodyCenter;
+                    var falloffMultiplier = rigidBodies.Get(entity).Mass / diff.LengthSquared;
                     forces += diff * falloffMultiplier;
                 }
 

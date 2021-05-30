@@ -23,11 +23,10 @@ namespace Engine.Game.Systems
             var rigidBodies = sharedData.rigidBodies;
             var velocities = sharedData.velocities;
 
-            foreach (var idx in bodies)
+            foreach (var entity in bodies)
             {
-                if (rigidBodies.Get(idx).Locked) continue;
-
-                ref var velocity = ref velocities.Get(idx).Linear;
+                if (rigidBodies.Get(entity).Locked) continue;
+                ref var velocity = ref velocities.Get(entity).Linear;
                 velocity += gravityDt;
             }
         }
